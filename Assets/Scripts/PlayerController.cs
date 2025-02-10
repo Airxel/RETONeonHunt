@@ -2,12 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Windows;
 
 public class PlayerController : MonoBehaviour
 {
     [SerializeField]
-    private Rigidbody bodyRb;
-    private Rigidbody playerRb;
+    private Rigidbody ballRb;
     private float playerMovementX;
     private float playerMovementY;
 
@@ -18,25 +18,20 @@ public class PlayerController : MonoBehaviour
     public float playerTilt;
     private float tiltAngle;
 
-    private void Start()
-    {
-        playerRb = GetComponent<Rigidbody>();
-    }
-
     private void FixedUpdate()
     {
         Vector3 playerMovement = new Vector3(playerMovementX, 0.0f, playerMovementY);
 
-        playerRb.AddForce(playerMovement * playerSpeed);
+        ballRb.AddForce(playerMovement * playerSpeed);
 
-        Vector3 playerVelocity = playerRb.velocity;
+        Vector3 playerVelocity = ballRb.velocity;
 
         if (playerVelocity.magnitude > 0.1f)
         {
             tiltAngle = Mathf.Clamp(playerVelocity.x * playerTilt, -playerTilt, playerTilt);
         }
 
-        playerRb.rotation = Quaternion.Euler(0.0f, transform.eulerAngles.y, -tiltAngle);
+        ballRb.rotation = Quaternion.Euler(0.0f, transform.eulerAngles.y, -tiltAngle);
     }
 
     private void OnMove(InputValue movementValue)
