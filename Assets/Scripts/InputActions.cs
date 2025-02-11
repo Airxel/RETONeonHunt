@@ -26,16 +26,6 @@ public class InputActions : MonoBehaviour
         ShootInput(shootValue.isPressed);
     }
 
-    private void OnDisable()
-    {
-        playerMove = Vector2.zero; // Resetea el movimiento al desactivar el script
-    }
-
-    private void Update()
-    {
-        Debug.Log("PlayerMove: " + playerMove); // Verifica en la consola si sigue moviéndose solo
-    }
-
     public void MoveInput(Vector2 newMovementValue)
     {
         playerMove = newMovementValue;

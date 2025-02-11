@@ -2,12 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.XR;
 using UnityEngine.Windows;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField]
     private Rigidbody ballRb;
     private float playerMovementX;
     private float playerMovementY;
@@ -15,14 +13,17 @@ public class PlayerController : MonoBehaviour
     [Header("Player")]
     [SerializeField]
     public float playerSpeed;
-    private float speed;
-    private float targetRotation;
-    private float rotationVelocity;
-    private float verticalVelocity;
+    private float playerVelocity;
     [SerializeField]
-    public float rotationSmooth;
+    private float speedAcceleration;
+    private float joystickInput;
     [SerializeField]
     public float speedChangeRate;
+    private float targetRotation;
+    private float rotationVelocity;
+    [SerializeField]
+    public float rotationSmooth;
+    
 
     [SerializeField]
     public float playerTilt;
@@ -37,6 +38,11 @@ public class PlayerController : MonoBehaviour
     private float bottomCameraLimit;
     private float cameraTargetYaw;
     private float cameraTargetPitch;
+
+    private bool IsCurrentDeviceMouse
+    {
+        get { return playerInput.currentControlScheme == "KeyboardMouse"; }
+    }
 
     private PlayerInput playerInput;
     private InputActions inputActions;
@@ -62,94 +68,95 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        
+        PlayerMovement();
     }
 
     private void Update()
     {
-        NewMove();
+        CameraRotation();
     }
 
     private void PlayerMovement()
     {
-        float targetSpeed = playerSpeed;
-
-        // if there is no input, set the target speed to 0
-        if (inputActions.playerMove == Vector2.zero)
-        {
-            targetSpeed = 0.0f;
-        }
-
-        // a reference to the players current horizontal velocity
-        float currentHorizontalSpeed = new Vector3(characterController.velocity.x, 0.0f, characterController.velocity.z).magnitude;
-
-        float speedOffset = 0.1f;
-        float inputMagnitude = inputActions.analogMovement ? inputActions.playerMove.magnitude : 1f;
-
-        // accelerate or decelerate to target speed
-        if (currentHorizontalSpeed < targetSpeed - speedOffset || currentHorizontalSpeed > targetSpeed + speedOffset)
-        {
-            // creates curved result rather than a linear one giving a more organic speed change
-            // note T in Lerp is clamped, so we don't need to clamp our speed
-            speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude, Time.deltaTime * speedChangeRate);
-
-            // round speed to 3 decimal places
-            speed = Mathf.Round(speed * 1000f) / 1000f;
-        }
-        else
-        {
-            speed = targetSpeed;
-        }
-
-        // normalise input direction
-        Vector3 inputDirection = new Vector3(inputActions.playerMove.x, 0.0f, inputActions.playerMove.y).normalized;
-
-        // note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
-        // if there is a move input rotate player when the player is moving
-        if (inputActions.playerMove != Vector2.zero)
-        {
-            targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg + mainCamera.transform.eulerAngles.y;
-
-            float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetRotation, ref rotationVelocity, rotationSmooth);
-
-            // rotate to face input direction relative to camera position
-            transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
-        }
-
-        Vector3 targetDirection = Quaternion.Euler(0.0f, targetRotation, 0.0f) * Vector3.forward;
-
-        // move the player
-        characterController.Move(targetDirection.normalized * (speed * Time.deltaTime));
-    }
-
-    private void NewMove()
-    {
+        // Se guarda la velocidad actual
         float newPlayerSpeed = playerSpeed;
 
+        // Si no hay inputs, no se mueve
         if (inputActions.playerMove == Vector2.zero)
         {
             newPlayerSpeed = 0.0f;
         }
 
-        // normalise input direction
-        Vector3 playerMovement = new Vector3(inputActions.playerMove.x, 0.0f, inputActions.playerMove.y);
+        // Se guarda la velocity actual del Character Controller
+        playerVelocity = new Vector3(characterController.velocity.x, 0.0f, characterController.velocity.z).magnitude;
 
-        // note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
-        // if there is a move input rotate player when the player is moving
-        if (inputActions.playerMove != Vector2.zero)
+        // Variación si se usa un joystick (depende de cuanto se mueva)
+        if (inputActions.analogMovement)
         {
-            targetRotation = Mathf.Atan2(playerMovement.x, playerMovement.z) * Mathf.Rad2Deg + mainCamera.transform.eulerAngles.y;
-
-            float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetRotation, ref rotationVelocity, rotationSmooth);
-
-            // rotate to face input direction relative to camera position
-            transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
+            joystickInput = inputActions.playerMove.magnitude;
+        }
+        else
+        {
+            joystickInput = 1f;
         }
 
-        Vector3 targetDirection = Quaternion.Euler(0.0f, targetRotation, 0.0f) * Vector3.forward;
+        // Valor para que la aceleración se mantenga sin variar
+        float speedOffset = 0.1f;
 
-        // move the player
-        characterController.Move(targetDirection * newPlayerSpeed * Time.deltaTime);
+        // Se controla la aceleración del jugador
+        if (playerVelocity < newPlayerSpeed - speedOffset || playerVelocity > newPlayerSpeed + speedOffset)
+        {
+            speedAcceleration = Mathf.Lerp(playerVelocity, newPlayerSpeed * joystickInput, Time.deltaTime * speedChangeRate);
+        }
+        else
+        {
+            speedAcceleration = newPlayerSpeed;
+        }
+
+        // Se obtiene la dirección de movimiento del jugador
+        Vector3 playerDirection = new Vector3(inputActions.playerMove.x, 0.0f, inputActions.playerMove.y);
+
+        if (inputActions.playerMove != Vector2.zero)
+        {
+            // Se convierte la dirección a grados, en dirección a la cámara
+            targetRotation = Mathf.Atan2(playerDirection.x, playerDirection.z) * Mathf.Rad2Deg + mainCamera.transform.eulerAngles.y;
+
+            float playerRotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetRotation, ref rotationVelocity, rotationSmooth);
+
+            // Se aplica la rotación
+            transform.rotation = Quaternion.Euler(0.0f, playerRotation, 0.0f);
+        }
+
+        // Se mueve el jugador según la dirección en la que mire
+        Vector3 playerMovement = Quaternion.Euler(0.0f, targetRotation, 0.0f) * Vector3.forward;
+
+        characterController.Move(playerMovement * speedAcceleration * Time.deltaTime);
+    }
+
+    private void CameraRotation()
+    {
+        if (inputActions.playerLook != null)
+        {
+            //Don't multiply mouse input by Time.deltaTime;
+            float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1.0f : Time.deltaTime;
+
+            cameraTargetYaw += inputActions.playerLook.x * deltaTimeMultiplier;
+            cameraTargetPitch += inputActions.playerLook.y * deltaTimeMultiplier;
+        }
+
+        // clamp our rotations so our values are limited 360 degrees
+        cameraTargetYaw = ClampAngle(cameraTargetYaw, float.MinValue, float.MaxValue);
+        cameraTargetPitch = ClampAngle(cameraTargetPitch, bottomCameraLimit, topCameraLimit);
+
+        // Cinemachine will follow this target
+        CameraTarget.transform.rotation = Quaternion.Euler(cameraTargetPitch, cameraTargetYaw, 0.0f);
+    }
+
+    private static float ClampAngle(float lfAngle, float lfMin, float lfMax)
+    {
+        if (lfAngle < -360f) lfAngle += 360f;
+        if (lfAngle > 360f) lfAngle -= 360f;
+        return Mathf.Clamp(lfAngle, lfMin, lfMax);
     }
 
     private void OldMove()
