@@ -31,13 +31,17 @@ public class PlayerController : MonoBehaviour
 
     [Header("Camera")]
     [SerializeField]
-    private GameObject CameraTarget;
+    private GameObject cameraTarget;
     [SerializeField]
     private float topCameraLimit;
     [SerializeField]
     private float bottomCameraLimit;
     private float cameraTargetYaw;
     private float cameraTargetPitch;
+
+    private const float cameraThreshold = 0.01f;
+    public bool lockCameraPosition = false;
+    public float cameraAngleOverride = 0.0f;
 
     private bool IsCurrentDeviceMouse
     {
@@ -59,19 +63,19 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
-        cameraTargetYaw = CameraTarget.transform.rotation.eulerAngles.y;
+        cameraTargetYaw = cameraTarget.transform.rotation.eulerAngles.y;
 
         playerInput = GetComponent<PlayerInput>();
         inputActions = GetComponent<InputActions>();
         characterController = GetComponent<CharacterController>();
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
         PlayerMovement();
     }
 
-    private void Update()
+    private void LateUpdate()
     {
         CameraRotation();
     }
@@ -135,13 +139,13 @@ public class PlayerController : MonoBehaviour
 
     private void CameraRotation()
     {
-        if (inputActions.playerLook != null)
+        if (inputActions.playerLook.sqrMagnitude >= cameraThreshold && !lockCameraPosition)
         {
             //Don't multiply mouse input by Time.deltaTime;
             float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1.0f : Time.deltaTime;
 
-            cameraTargetYaw += inputActions.playerLook.x * deltaTimeMultiplier;
-            cameraTargetPitch += inputActions.playerLook.y * deltaTimeMultiplier;
+            cameraTargetYaw += inputActions.playerLook.x;
+            cameraTargetPitch += inputActions.playerLook.y;
         }
 
         // clamp our rotations so our values are limited 360 degrees
@@ -149,7 +153,7 @@ public class PlayerController : MonoBehaviour
         cameraTargetPitch = ClampAngle(cameraTargetPitch, bottomCameraLimit, topCameraLimit);
 
         // Cinemachine will follow this target
-        CameraTarget.transform.rotation = Quaternion.Euler(cameraTargetPitch, cameraTargetYaw, 0.0f);
+        cameraTarget.transform.rotation = Quaternion.Euler(cameraTargetPitch + cameraAngleOverride, cameraTargetYaw, 0.0f);
     }
 
     private static float ClampAngle(float lfAngle, float lfMin, float lfMax)
