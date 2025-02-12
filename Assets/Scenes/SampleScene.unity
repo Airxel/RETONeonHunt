@@ -415,11 +415,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e82b00bef44dc44da76f6858b7313c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ballRb: {fileID: 0}
   playerSpeed: 5
   speedAcceleration: 0
-  speedChangeRate: 0
+  speedChangeFactor: 0
   rotationSmooth: 0
-  playerTilt: 5
+  tiltAmount: 0
+  tiltSmooth: 0
   cameraTarget: {fileID: 0}
   topCameraLimit: 0
   bottomCameraLimit: 0
@@ -996,11 +998,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e82b00bef44dc44da76f6858b7313c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ballRb: {fileID: 0}
   playerSpeed: 5
   speedAcceleration: 0
-  speedChangeRate: 7.5
+  speedChangeFactor: 5
   rotationSmooth: 0.5
-  playerTilt: 10
+  tiltAmount: 10
+  tiltSmooth: 5
   cameraTarget: {fileID: 1456126238}
   topCameraLimit: 70
   bottomCameraLimit: -30
