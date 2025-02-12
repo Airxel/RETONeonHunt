@@ -308,14 +308,15 @@ GameObject:
   - component: {fileID: 404793700}
   - component: {fileID: 404793706}
   - component: {fileID: 404793705}
-  - component: {fileID: 404793704}
+  - component: {fileID: 404793707}
+  - component: {fileID: 404793708}
   m_Layer: 0
   m_Name: Player Movement
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!135 &404793700
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -403,30 +404,6 @@ Transform:
   - {fileID: 385229040595747300}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &404793704
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 404793699}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3e82b00bef44dc44da76f6858b7313c7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ballRb: {fileID: 0}
-  playerSpeed: 5
-  speedAcceleration: 0
-  speedChangeFactor: 0
-  rotationSmooth: 0
-  tiltAmount: 0
-  tiltSmooth: 0
-  cameraTarget: {fileID: 0}
-  topCameraLimit: 0
-  bottomCameraLimit: 0
-  lockCameraPosition: 0
-  cameraAngleOverride: 0
 --- !u!114 &404793705
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -467,8 +444,8 @@ Rigidbody:
   m_GameObject: {fileID: 404793699}
   serializedVersion: 4
   m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0
+  m_Drag: 0.25
+  m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -485,6 +462,44 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &404793707
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 404793699}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0fb0da7b4dfcf94896c7936887d0ca7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 5
+  acceleration: 10
+  deceleration: 10
+  lateralTiltAmount: 10
+  lateralTiltResetSpeed: 5
+  rotationSmooth: 10
+  playerSpeed: 10
+  speedAcceleration: 0
+  accelerationFactor: 1.25
+  decelerationFactor: 2.5
+--- !u!114 &404793708
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 404793699}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 849e4df22ce594b46aed1eccabd7c09f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerMove: {x: 0, y: 0}
+  playerLook: {x: 0, y: 0}
+  playerShoot: 0
+  analogMovement: 0
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -938,7 +953,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1155949668
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -998,18 +1013,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e82b00bef44dc44da76f6858b7313c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ballRb: {fileID: 0}
   playerSpeed: 5
   speedAcceleration: 0
   speedChangeFactor: 5
   rotationSmooth: 0.5
-  tiltAmount: 10
-  tiltSmooth: 5
   cameraTarget: {fileID: 1456126238}
   topCameraLimit: 70
   bottomCameraLimit: -30
   lockCameraPosition: 0
   cameraAngleOverride: 0
+  moveSpeed: 5
+  acceleration: 10
+  deceleration: 10
+  tiltAmount: 10
+  tiltSmooth: 5
 --- !u!143 &1155949671
 CharacterController:
   m_ObjectHideFlags: 0
