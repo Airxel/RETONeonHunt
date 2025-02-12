@@ -6,34 +6,29 @@ using UnityEngine.Windows;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField]
-    private Rigidbody ballRb;
-    private float playerMovementX;
-    private float playerMovementY;
-
     [Header("Player")]
     [SerializeField]
-    public float playerSpeed;
+    private float playerSpeed;
     private float playerVelocity;
     [SerializeField]
     private float speedAcceleration;
     private float joystickInput;
 
     [SerializeField]
-    public float speedChangeFactor;
+    private float speedChangeFactor;
     private float targetRotation;
     private float rotationVelocity;
     [SerializeField]
-    public float rotationSmooth;
+    private float rotationSmooth;
+
+    private float frontalTilt;
+    private float lateralTilt;
     
 
     [SerializeField]
     private float tiltAmount;
     [SerializeField]
     private float tiltSmooth;
-
-    private float playerTilt;
-    private float tiltAngle;
 
     [Header("Camera")]
     [SerializeField]
@@ -48,11 +43,6 @@ public class PlayerController : MonoBehaviour
     private const float cameraThreshold = 0.01f;
     public bool lockCameraPosition = false;
     public float cameraAngleOverride = 0.0f;
-
-    private bool IsCurrentDeviceMouse
-    {
-        get { return playerInput.currentControlScheme == "KeyboardMouse"; }
-    }
 
     private PlayerInput playerInput;
     private InputActions inputActions;
@@ -69,8 +59,6 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
-        cameraTargetYaw = cameraTarget.transform.rotation.eulerAngles.y;
-
         playerInput = GetComponent<PlayerInput>();
         inputActions = GetComponent<InputActions>();
         characterController = GetComponent<CharacterController>();
@@ -79,11 +67,6 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         PlayerMovement();
-    }
-
-    private void LateUpdate()
-    {
-        CameraRotation();
     }
 
     private void PlayerMovement()
@@ -126,6 +109,8 @@ public class PlayerController : MonoBehaviour
         // Se obtiene la dirección de movimiento del jugador
         Vector3 playerDirection = new Vector3(inputActions.playerMove.x, 0.0f, inputActions.playerMove.y);
 
+        targetRotation = transform.eulerAngles.y;
+
         if (inputActions.playerMove != Vector2.zero)
         {
             // Se convierte la dirección a grados, en dirección a la cámara
@@ -133,64 +118,36 @@ public class PlayerController : MonoBehaviour
 
             float playerRotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetRotation, ref rotationVelocity, rotationSmooth);
 
-            // **Cálculo de inclinación**
-            float tiltX = -inputActions.playerMove.y * tiltAmount; // Adelante (+) / Atrás (-)
-            float tiltZ = inputActions.playerMove.x * tiltAmount;  // Izquierda (+) / Derecha (-)
+            // Se calcula la inclinación al moverse
+            frontalTilt = inputActions.playerMove.magnitude * tiltAmount;
 
-            // Aplicamos la suavización para transiciones suaves
-            float smoothedTiltX = Mathf.LerpAngle(transform.eulerAngles.x, tiltX, Time.deltaTime * tiltSmooth);
-            float smoothedTiltZ = Mathf.LerpAngle(transform.eulerAngles.z, tiltZ, Time.deltaTime * tiltSmooth);
+            lateralTilt = 0.0f;
 
-            // Aplicar inclinación y rotación
-            transform.rotation = Quaternion.Euler(smoothedTiltX, playerRotation, smoothedTiltZ);
+            if (Mathf.Abs(Mathf.DeltaAngle(transform.eulerAngles.y, targetRotation)) > 0.1f)
+            {
+                lateralTilt = inputActions.playerMove.magnitude * tiltAmount; // Inclinación lateral según el movimiento
+            }
+            
+            float smoothedFrontalTilt = Mathf.LerpAngle(transform.localEulerAngles.x, frontalTilt, Time.deltaTime * tiltSmooth);
+            float smoothedLateralTilt = Mathf.LerpAngle(transform.localEulerAngles.z, lateralTilt, Time.deltaTime * tiltSmooth);
+
+            // Se aplica la inclinación y rotación
+            transform.rotation = Quaternion.Euler(smoothedFrontalTilt, playerRotation, smoothedLateralTilt);
+        }
+        else
+        {
+            // Si no hay movimiento, se hace una interpolación para devolver las inclinaciones a 0
+            float smoothedFrontalTilt = Mathf.LerpAngle(transform.localEulerAngles.x, 0.0f, Time.deltaTime * tiltSmooth);
+            float smoothedLateralTilt = Mathf.LerpAngle(transform.localEulerAngles.z, 0.0f, Time.deltaTime * tiltSmooth);
+
+            // Aplicar la rotación sin inclinación
+            transform.localRotation = Quaternion.Euler(smoothedFrontalTilt, transform.localEulerAngles.y, smoothedLateralTilt);
         }
 
         // Se mueve el jugador según la dirección en la que mire
         Vector3 playerMovement = Quaternion.Euler(0.0f, targetRotation, 0.0f) * Vector3.forward;
 
         characterController.Move(playerMovement * speedAcceleration * Time.deltaTime);
-    }
-
-    private void CameraRotation()
-    {
-        if (inputActions.playerLook.sqrMagnitude >= cameraThreshold && !lockCameraPosition)
-        {
-            //Don't multiply mouse input by Time.deltaTime;
-            float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1.0f : Time.deltaTime;
-
-            cameraTargetYaw += inputActions.playerLook.x;
-            cameraTargetPitch += inputActions.playerLook.y;
-        }
-
-        // clamp our rotations so our values are limited 360 degrees
-        cameraTargetYaw = ClampAngle(cameraTargetYaw, float.MinValue, float.MaxValue);
-        cameraTargetPitch = ClampAngle(cameraTargetPitch, bottomCameraLimit, topCameraLimit);
-
-        // Cinemachine will follow this target
-        cameraTarget.transform.rotation = Quaternion.Euler(cameraTargetPitch + cameraAngleOverride, cameraTargetYaw, 0.0f);
-    }
-
-    private static float ClampAngle(float lfAngle, float lfMin, float lfMax)
-    {
-        if (lfAngle < -360f) lfAngle += 360f;
-        if (lfAngle > 360f) lfAngle -= 360f;
-        return Mathf.Clamp(lfAngle, lfMin, lfMax);
-    }
-
-    private void OldMove()
-    {
-        Vector3 playerMovement = new Vector3(inputActions.playerMove.x, 0.0f, inputActions.playerMove.y);
-
-        ballRb.AddForce(playerMovement * playerSpeed);
-
-        Vector3 playerVelocity = ballRb.velocity;
-
-        if (playerVelocity.magnitude > 0.1f)
-        {
-            tiltAngle = Mathf.Clamp(playerVelocity.x * playerTilt, -playerTilt, playerTilt);
-        }
-
-        ballRb.rotation = Quaternion.Euler(0.0f, transform.eulerAngles.y, -tiltAngle);
     }
 
     private void NewPlayerMovement()
