@@ -79,7 +79,7 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        Move();
+        OtherPlayerMovement();
     }
 
     private void PlayerMovement()
@@ -271,4 +271,65 @@ public class PlayerController : MonoBehaviour
 
         characterController.Move(playerMovement * speedAcceleration * Time.deltaTime);
     }
+
+    private void OtherPlayerMovement()
+    {
+        // Se guarda la velocidad actual
+        float newPlayerSpeed = playerSpeed;
+
+        // Si no hay inputs, no se mueve
+        if (inputActions.playerMove == Vector2.zero)
+        {
+            newPlayerSpeed = 0.0f;
+        }
+
+        // Se guarda la velocity actual del Character Controller
+        playerVelocity = new Vector3(characterController.velocity.x, 0.0f, characterController.velocity.z).magnitude;
+
+        // Variación si se usa un joystick (depende de cuánto se mueva)
+        joystickInput = inputActions.analogMovement ? inputActions.playerMove.magnitude : 1f;
+
+        // Se controla la aceleración del jugador
+        speedAcceleration = Mathf.Lerp(playerVelocity, newPlayerSpeed * joystickInput, Time.deltaTime * speedChangeFactor);
+
+        // Se obtiene la dirección de movimiento del jugador en el mundo
+        Vector3 playerDirection = new Vector3(inputActions.playerMove.x, 0.0f, inputActions.playerMove.y).normalized;
+
+        float targetRotation = transform.eulerAngles.y; // Mantener la rotación
+
+        if (inputActions.playerMove != Vector2.zero)
+        {
+            // Se convierte la dirección a grados y la ajustamos con la cámara
+            targetRotation = Mathf.Atan2(playerDirection.x, playerDirection.z) * Mathf.Rad2Deg;
+
+            float playerRotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetRotation, ref rotationVelocity, rotationSmooth);
+
+            // **Obtenemos el vector de movimiento real**
+            Vector3 playerMovement = Quaternion.Euler(0.0f, targetRotation, 0.0f) * Vector3.forward;
+
+            // **Inclinación basada en el movimiento**
+            frontalTilt = -playerMovement.z * tiltAmount; // Se inclina en la dirección del movimiento
+            lateralTilt = playerMovement.x * tiltAmount;  // Se inclina lateralmente según el movimiento
+        }
+        else
+        {
+            // Si el jugador está quieto, la inclinación vuelve a 0
+            frontalTilt = 0f;
+            lateralTilt = 0f;
+        }
+
+        // Suavizamos la inclinación para evitar cambios bruscos
+        float smoothedFrontalTilt = Mathf.LerpAngle(transform.eulerAngles.x, frontalTilt, Time.deltaTime * tiltSmooth);
+        float smoothedLateralTilt = Mathf.LerpAngle(transform.eulerAngles.z, lateralTilt, Time.deltaTime * tiltSmooth);
+        float smoothedRotation = Mathf.LerpAngle(transform.eulerAngles.y, targetRotation, Time.deltaTime * rotationSmooth);
+
+        // Aplicamos la rotación e inclinación
+        transform.rotation = Quaternion.Euler(smoothedFrontalTilt, smoothedRotation, smoothedLateralTilt);
+
+        // Se mueve el jugador según la dirección en la que mire
+        Vector3 movement = Quaternion.Euler(0.0f, targetRotation, 0.0f) * Vector3.forward;
+
+        characterController.Move(movement * speedAcceleration * Time.deltaTime);
+    }
+
 }

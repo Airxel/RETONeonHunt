@@ -28,34 +28,6 @@ namespace StarterAssets
         [Tooltip("Acceleration and deceleration")]
         public float SpeedChangeRate = 10.0f;
 
-        public AudioClip LandingAudioClip;
-        public AudioClip[] FootstepAudioClips;
-        [Range(0, 1)] public float FootstepAudioVolume = 0.5f;
-
-        [Space(10)]
-        [Tooltip("The height the player can jump")]
-        public float JumpHeight = 1.2f;
-
-        [Tooltip("The character uses its own gravity value. The engine default is -9.81f")]
-        public float Gravity = -15.0f;
-
-        [Space(10)]
-        [Tooltip("Time required to pass before being able to jump again. Set to 0f to instantly jump again")]
-        public float JumpTimeout = 0.50f;
-
-        [Tooltip("Time required to pass before entering the fall state. Useful for walking down stairs")]
-        public float FallTimeout = 0.15f;
-
-        [Header("Player Grounded")]
-        [Tooltip("If the character is grounded or not. Not part of the CharacterController built in grounded check")]
-        public bool Grounded = true;
-
-        [Tooltip("Useful for rough ground")]
-        public float GroundedOffset = -0.14f;
-
-        [Tooltip("The radius of the grounded check. Should match the radius of the CharacterController")]
-        public float GroundedRadius = 0.28f;
-
         [Tooltip("What layers the character uses as ground")]
         public LayerMask GroundLayers;
 
@@ -85,12 +57,6 @@ namespace StarterAssets
         private float _targetRotation = 0.0f;
         private float _rotationVelocity;
         private float _verticalVelocity;
-
-
-
-        // animation IDs
-        private int _animIDSpeed;
-        private int _animIDMotionSpeed;
 
 #if ENABLE_INPUT_SYSTEM 
         private PlayerInput _playerInput;
@@ -129,11 +95,12 @@ namespace StarterAssets
         private void Start()
         {
             _cinemachineTargetYaw = CinemachineCameraTarget.transform.rotation.eulerAngles.y;
-            
+
             _hasAnimator = TryGetComponent(out _animator);
             _controller = GetComponent<CharacterController>();
             _input = GetComponent<StarterAssetsInputs>();
             _playerInput = GetComponent<PlayerInput>();
+
         }
 
         private void Update()
@@ -147,10 +114,6 @@ namespace StarterAssets
         {
             CameraRotation();
         }
-
-        
-
-        
 
         private void CameraRotation()
         {
@@ -217,7 +180,8 @@ namespace StarterAssets
             // if there is a move input rotate player when the player is moving
             if (_input.move != Vector2.zero)
             {
-                _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg;
+                _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
+                                  _mainCamera.transform.eulerAngles.y;
                 float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
                     RotationSmoothTime);
 
@@ -231,16 +195,7 @@ namespace StarterAssets
             // move the player
             _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) +
                              new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
-
-            // update animator if using character
-            if (_hasAnimator)
-            {
-                _animator.SetFloat(_animIDSpeed, _animationBlend);
-                _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
-            }
         }
-
-        
 
         private static float ClampAngle(float lfAngle, float lfMin, float lfMax)
         {
@@ -248,11 +203,5 @@ namespace StarterAssets
             if (lfAngle > 360f) lfAngle -= 360f;
             return Mathf.Clamp(lfAngle, lfMin, lfMax);
         }
-
-        
-
-        
-
-        
     }
 }

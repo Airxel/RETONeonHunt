@@ -1,296 +1,55 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class NewPlayerController : MonoBehaviour
+public class RobotController : MonoBehaviour
 {
-    private InputActions inputActions;
     private Rigidbody ballRb;
-    public float moveSpeed = 5f;
-    public float acceleration = 10f;
-    public float deceleration = 10f;
-    //public float tiltAmount = 15f;  // Inclinación hacia adelante
-    //public float tiltSmooth = 5f;   // Suavidad de la inclinación
-    public float lateralTiltAmount = 10f; // Inclinación lateral al girar
-    public float lateralTiltResetSpeed = 5f; // Velocidad de reseteo lateral
+    private InputActions inputActions;
 
-    private Vector3 moveDirection;
-    private Vector3 velocity;
-    private float targetTilt = 0.0f;
-    //private float lateralTilt = 0.0f;
-    private float previousRotation = 0.0f;
-    private float currentSpeed = 0.0f;
+    [SerializeField]
+    private GameObject playerRobot;
 
-    float tiltAmount = 25f;      // Cuánto se inclina el robot
-    private float frontalTilt = 25f;
-    private float lateralTilt = 25f;
-    float maxTiltAngle = 20.0f;    // Máxima inclinación
-    float tiltSmooth = 5.0f;       // Suavidad de inclinación
-    float tiltResetSpeed = 2.0f;   // Velocidad de regreso a 0
-    private float targetRotation;
-    private float rotationVelocity;
     [SerializeField]
-    private float rotationSmooth;
+    private float playerSpeed = 5f;
+    [SerializeField]
+    private float tiltFactor = 5f;
+    [SerializeField]
+    private float tiltLimit = 25f;
+    [SerializeField]
+    private float tiltSmooth = 5f;
 
-    [Header("Player")]
-    [SerializeField]
-    private float playerSpeed;
-    [SerializeField]
-    private float speedAcceleration;
-    [SerializeField]
-    private float accelerationFactor;
-    [SerializeField]
-    private float decelerationFactor;
-    private float velocitySmoothing = 10f;
-
-
-    void Start()
+    private void Awake()
     {
         ballRb = GetComponent<Rigidbody>();
         inputActions = GetComponent<InputActions>();
-        previousRotation = transform.eulerAngles.y;
     }
 
-    void FixedUpdate()
+    private void Update()
     {
-        PlayerMove();
+        playerRobot.transform.position = transform.position;
     }
 
-    private void PlayerMove()
-    {
-        Vector3 playerMovement = new Vector3(inputActions.playerMove.x, 0.0f, inputActions.playerMove.y).normalized;
-
-        if (playerMovement.magnitude > 0.1f)
-        {
-            velocity = Vector3.Lerp(velocity, playerMovement * moveSpeed, Time.deltaTime * acceleration);
-            targetTilt = -tiltAmount; // Inclinación hacia adelante
-        }
-        else
-        {
-            velocity = Vector3.Lerp(velocity, Vector3.zero, Time.deltaTime * deceleration);
-            targetTilt = 0.0f; // Volver a posición original
-        }
-
-        ballRb.velocity = new Vector3(velocity.x, ballRb.velocity.y, velocity.z);
-
-        // **Detectar si el personaje está girando**
-        float currentRotation = transform.eulerAngles.y;
-        float rotationSpeed = Mathf.Abs(Mathf.DeltaAngle(previousRotation, currentRotation)) / Time.deltaTime;
-
-        if (rotationSpeed > 1.0f)  // Si está girando
-        {
-            lateralTilt = lateralTiltAmount * Mathf.Sign(Mathf.DeltaAngle(previousRotation, currentRotation));
-        }
-        else
-        {
-            lateralTilt = Mathf.Lerp(lateralTilt, 0.0f, Time.deltaTime * lateralTiltResetSpeed);
-        }
-
-        previousRotation = currentRotation; // Guardar rotación para la siguiente verificación
-
-        // Aplicar inclinaciones suavemente
-        float smoothedFrontalTilt = Mathf.LerpAngle(transform.localEulerAngles.x, targetTilt, Time.deltaTime * tiltSmooth);
-        float smoothedLateralTilt = Mathf.LerpAngle(transform.localEulerAngles.z, lateralTilt, Time.deltaTime * tiltSmooth);
-
-        // Aplicar inclinación
-        transform.rotation = Quaternion.Euler(smoothedFrontalTilt, transform.eulerAngles.y, smoothedLateralTilt);
-
-        // Rotar hacia la dirección de movimiento
-        if (playerMovement != Vector3.zero)
-        {
-            Quaternion targetRotation = Quaternion.LookRotation(playerMovement);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
-        }
-    }
-
-    private void PlayerMoveExample()
+    private void FixedUpdate()
     {
         Vector3 playerMovement = new Vector3(inputActions.playerMove.x, 0.0f, inputActions.playerMove.y).normalized;
 
-        if (playerMovement.magnitude > 0.1f)
-        {
-            speedAcceleration = Mathf.Lerp(speedAcceleration, playerSpeed, Time.deltaTime * accelerationFactor);
-        }
-        else
-        {
-            speedAcceleration = Mathf.Lerp(speedAcceleration, 0.0f, Time.deltaTime * decelerationFactor);
-        }
+        ballRb.AddForce(playerMovement * playerSpeed);
 
-        Vector3 playerVelocity = playerMovement * speedAcceleration;
-        ballRb.velocity = new Vector3(playerVelocity.x, ballRb.velocity.y, playerVelocity.z);
+        Vector3 playerVelocity = ballRb.velocity;
 
         if (playerVelocity.magnitude > 0.1f)
         {
-            frontalTilt = Mathf.Clamp(playerVelocity.x * tiltAmount, -tiltAmount, tiltAmount);
-            lateralTilt = Mathf.Clamp(playerVelocity.z * tiltAmount, -tiltAmount, tiltAmount);
+            float lateralTiltAngle = Mathf.Clamp(playerVelocity.x * tiltFactor, -tiltLimit, tiltLimit);
+            float frontalTiltAngle = Mathf.Clamp(playerVelocity.z * tiltFactor, -tiltLimit, tiltLimit);
+
+            //float smoothedFrontalTilt = Mathf.LerpAngle(transform.eulerAngles.x, frontalTiltAngle, Time.deltaTime * tiltSmooth);
+            //float smoothedLateralTilt = Mathf.LerpAngle(transform.eulerAngles.z, lateralTiltAngle, Time.deltaTime * tiltSmooth);
+
+            playerRobot.transform.rotation = Quaternion.Euler(frontalTiltAngle, 0, -lateralTiltAngle);
         }
         else
         {
-            frontalTilt = 0.0f; // Volver a posición original
-            lateralTilt = 0.0f;
-        }
 
-        float smoothedFrontalTilt = Mathf.LerpAngle(transform.eulerAngles.x, frontalTilt, Time.deltaTime * tiltSmooth);
-        float smoothedLateralTilt = Mathf.LerpAngle(transform.eulerAngles.z, lateralTilt, Time.deltaTime * tiltSmooth);
-
-        // Aplicar inclinación
-        transform.rotation = Quaternion.Euler(smoothedFrontalTilt, transform.eulerAngles.y, smoothedLateralTilt);
-
-        // Se mueve el jugador según la dirección en la que mire
-        playerMovement = Quaternion.Euler(0.0f, targetRotation, 0.0f) * Vector3.forward;
-
-        // Se convierte la dirección a grados, en dirección a la cámara
-        targetRotation = Mathf.Atan2(playerMovement.x, playerMovement.z) * Mathf.Rad2Deg; //+ mainCamera.transform.eulerAngles.y;
-
-
-
-        //ballRb.AddForce(playerMovement * speedAcceleration);
-    }
-
-    private void MoreMovement()
-    {
-        Vector2 input = inputActions.playerMove;
-        moveDirection = new Vector3(input.x, 0.0f, input.y).normalized;
-
-        if (moveDirection.magnitude > 0.1f)
-        {
-            velocity = Vector3.Lerp(velocity, moveDirection * moveSpeed, Time.deltaTime * acceleration);
-            targetTilt = -tiltAmount; // Inclinación hacia adelante
-        }
-        else
-        {
-            velocity = Vector3.Lerp(velocity, Vector3.zero, Time.deltaTime * deceleration);
-            targetTilt = 0.0f; // Volver a posición original
-        }
-
-        ballRb.velocity = new Vector3(velocity.x, ballRb.velocity.y, velocity.z);
-
-        // **Detectar si el personaje está girando**
-        float currentRotation = transform.eulerAngles.y;
-        float rotationSpeed = Mathf.Abs(Mathf.DeltaAngle(previousRotation, currentRotation)) / Time.deltaTime;
-
-        if (rotationSpeed > 1.0f)  // Si está girando
-        {
-            lateralTilt = lateralTiltAmount * Mathf.Sign(Mathf.DeltaAngle(previousRotation, currentRotation));
-        }
-        else
-        {
-            lateralTilt = Mathf.Lerp(lateralTilt, 0.0f, Time.deltaTime * lateralTiltResetSpeed);
-        }
-
-        previousRotation = currentRotation; // Guardar rotación para la siguiente verificación
-
-        // Aplicar inclinaciones suavemente
-        float smoothedFrontalTilt = Mathf.LerpAngle(transform.localEulerAngles.x, targetTilt, Time.deltaTime * tiltSmooth);
-        float smoothedLateralTilt = Mathf.LerpAngle(transform.localEulerAngles.z, lateralTilt, Time.deltaTime * tiltSmooth);
-
-        // Aplicar inclinación
-        transform.rotation = Quaternion.Euler(smoothedFrontalTilt, transform.eulerAngles.y, smoothedLateralTilt);
-
-        // Rotar hacia la dirección de movimiento
-        if (moveDirection != Vector3.zero)
-        {
-            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
-        }
-    }
-
-    private void AnotherMove()
-    {
-        Vector2 input = inputActions.playerMove;
-        moveDirection = new Vector3(input.x, 0.0f, input.y).normalized;
-
-        if (moveDirection.magnitude > 0.1f)
-        {
-            currentSpeed = Mathf.Lerp(currentSpeed, moveSpeed, Time.deltaTime * acceleration);
-        }
-        else
-        {
-            currentSpeed = Mathf.Lerp(currentSpeed, 0.0f, Time.deltaTime * deceleration);
-        }
-
-        velocity = moveDirection * currentSpeed;
-        ballRb.velocity = new Vector3(velocity.x, ballRb.velocity.y, velocity.z);
-
-        // **Evitar el cabezazo: la inclinación depende de la velocidad real**
-        targetTilt = -tiltAmount * (currentSpeed / moveSpeed);  // Inclinación frontal según la velocidad
-
-        // **Detectar si el personaje está girando**
-        float currentRotation = transform.eulerAngles.y;
-        float rotationSpeed = Mathf.Abs(Mathf.DeltaAngle(previousRotation, currentRotation)) / Time.deltaTime;
-
-        if (rotationSpeed > 1.0f)  // Si está girando
-        {
-            lateralTilt = lateralTiltAmount * Mathf.Sign(Mathf.DeltaAngle(previousRotation, currentRotation));
-        }
-        else
-        {
-            lateralTilt = Mathf.Lerp(lateralTilt, 0.0f, Time.deltaTime * lateralTiltResetSpeed);
-        }
-
-        previousRotation = currentRotation; // Guardar rotación para la siguiente verificación
-
-        // Aplicar inclinaciones suavemente
-        float smoothedFrontalTilt = Mathf.LerpAngle(transform.localEulerAngles.x, targetTilt, Time.deltaTime * tiltSmooth);
-        float smoothedLateralTilt = Mathf.LerpAngle(transform.localEulerAngles.z, lateralTilt, Time.deltaTime * tiltSmooth);
-
-        // Aplicar inclinación
-        transform.rotation = Quaternion.Euler(smoothedFrontalTilt, transform.eulerAngles.y, smoothedLateralTilt);
-
-        // Rotar hacia la dirección de movimiento
-        if (moveDirection != Vector3.zero)
-        {
-            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
-        }
-    }
-
-    private void PlayerMoveMain()
-    {
-        Vector3 playerMovement = new Vector3(inputActions.playerMove.x, 0.0f, inputActions.playerMove.y).normalized;
-
-        if (playerMovement.magnitude > 0.1f)
-        {
-            velocity = Vector3.Lerp(velocity, playerMovement * playerSpeed, Time.deltaTime * accelerationFactor);
-            frontalTilt = -tiltAmount; // Inclinación hacia adelante
-        }
-        else
-        {
-            velocity = Vector3.Lerp(velocity, Vector3.zero, Time.deltaTime * decelerationFactor);
-            frontalTilt = 0.0f; // Volver a posición original
-        }
-
-        ballRb.velocity = new Vector3(velocity.x, ballRb.velocity.y, velocity.z);
-
-        // **Detectar si el personaje está girando**
-        float currentRotation = transform.eulerAngles.y;
-        float rotationSpeed = Mathf.Abs(Mathf.DeltaAngle(previousRotation, currentRotation)) / Time.deltaTime;
-
-        if (rotationSpeed > 1.0f)  // Si está girando
-        {
-            lateralTilt = lateralTiltAmount * Mathf.Sign(Mathf.DeltaAngle(previousRotation, currentRotation));
-        }
-        else
-        {
-            lateralTilt = Mathf.Lerp(lateralTilt, 0.0f, Time.deltaTime * lateralTiltResetSpeed);
-        }
-
-        previousRotation = currentRotation; // Guardar rotación para la siguiente verificación
-
-        // Aplicar inclinaciones suavemente
-        float smoothedFrontalTilt = Mathf.LerpAngle(transform.localEulerAngles.x, frontalTilt, Time.deltaTime * tiltSmooth);
-        float smoothedLateralTilt = Mathf.LerpAngle(transform.localEulerAngles.z, lateralTilt, Time.deltaTime * tiltSmooth);
-
-        // Aplicar inclinación
-        transform.rotation = Quaternion.Euler(smoothedFrontalTilt, transform.eulerAngles.y, smoothedLateralTilt);
-
-        // Rotar hacia la dirección de movimiento
-        if (playerMovement != Vector3.zero)
-        {
-            Quaternion targetRotation = Quaternion.LookRotation(playerMovement);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
         }
     }
 }
