@@ -22,11 +22,14 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float tiltLimit = 25f;
     [SerializeField]
-    private float tiltResetSpeed = 5f;
-
+    private float frontalTiltSmoothSpeed = 5f;
     [SerializeField]
-    private float rotationSmoothSpeed = 0.1f; // Velocidad de suavizado de la rotación
-    private float rotationVelocity; // Almacena la velocidad del suavizado
+    private float lateralTiltSmoothSpeed = 0.1f;
+    [SerializeField]
+    private float tiltResetSpeed = 5f;
+    private float lateralTiltVelocity = 0.0f;
+    [SerializeField]
+    private float rotationSmoothSpeed = 0.1f;
 
     [Header("Cinemachine")]
     [SerializeField]
@@ -45,7 +48,7 @@ public class PlayerController : MonoBehaviour
     private float cameraTargetPitch;
     private float targetRotation;
 
-    private float lateralTiltVelocity = 0.0f; // Para usar con SmoothDamp
+    
 
     private void Awake()
     {
@@ -61,7 +64,8 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        PlayerMovement();  
+        PlayerMovement();
+        PlayerShooting();
     }
 
     private void LateUpdate()
@@ -90,23 +94,23 @@ public class PlayerController : MonoBehaviour
         if (velocityMagnitude > 0.1f)
         {
             // Inclinación frontal siempre hacia adelante
-            float forwardTiltTarget = Mathf.Clamp(velocityMagnitude * tiltFactor, 0.0f, tiltLimit);
+            float frontalTiltAmount = Mathf.Clamp(velocityMagnitude * tiltFactor, 0.0f, tiltLimit);
 
-            frontalTilt = Mathf.Lerp(frontalTilt, forwardTiltTarget, Time.deltaTime * tiltResetSpeed * 10f);
+            frontalTilt = Mathf.Lerp(frontalTilt, frontalTiltAmount, Time.deltaTime * frontalTiltSmoothSpeed * 10f);
 
             // Suavizar inclinación lateral evitando saltos bruscos
-            float rotationDifference = Mathf.DeltaAngle(bodyRotation, targetRotation);
+            float rotationDifference = Mathf.DeltaAngle(bodyRotation, targetRotation) * 0.05f;
 
-            float lateralTiltTarget = Mathf.Clamp(rotationDifference * 0.05f, -tiltLimit, tiltLimit); // Factor más bajo para suavizar
+            float lateralTiltAmount = Mathf.Clamp(rotationDifference, -tiltLimit, tiltLimit); // Factor más bajo para suavizar
 
             // Evitar cambios bruscos con SmoothDamp
-            lateralTilt = Mathf.SmoothDamp(lateralTilt, lateralTiltTarget, ref lateralTiltVelocity, 0.1f);
+            lateralTilt = Mathf.SmoothDamp(lateralTilt, lateralTiltAmount, ref lateralTiltVelocity, lateralTiltSmoothSpeed);
         }
         else
         {
             // Si no se mueve, reducir inclinaciones gradualmente
             frontalTilt = Mathf.Lerp(frontalTilt, 0.0f, Time.deltaTime * tiltResetSpeed * 100f);
-            lateralTilt = Mathf.SmoothDamp(lateralTilt, 0.0f, ref lateralTiltVelocity, 0.2f);
+            lateralTilt = Mathf.Lerp(lateralTilt, 0.0f, Time.deltaTime * tiltResetSpeed * 100f);
         }
 
         //  Aplicar la rotación del cuerpo
@@ -118,40 +122,14 @@ public class PlayerController : MonoBehaviour
         ballRb.AddForce(newPlayerMovement * playerSpeed);
     }
 
-    private void PlayerMovement2()
+    private void PlayerShooting()
     {
-        Vector3 playerMovement = new Vector3(inputActions.playerMove.x, 0.0f, inputActions.playerMove.y).normalized;
-
-        if (inputActions.playerMove.magnitude > 0.01f)
+        if (inputActions.playerShoot)
         {
-            // Se convierte la dirección a grados, en dirección a la cámara
-            targetRotation = Mathf.Atan2(playerMovement.x, playerMovement.z) * Mathf.Rad2Deg + mainCamera.transform.eulerAngles.y;
+            Debug.Log("Shooting");
+
+            inputActions.playerShoot = false;
         }
-
-        Vector3 playerVelocity = ballRb.velocity;
-
-        if (playerVelocity.magnitude > 0.1f)
-        {
-            lateralTilt = Mathf.Clamp(playerVelocity.x * tiltFactor, -tiltLimit, tiltLimit);
-            frontalTilt = Mathf.Clamp(playerVelocity.z * tiltFactor, -tiltLimit, tiltLimit);
-            bodyRotation = Mathf.LerpAngle(bodyRotation, targetRotation, Time.deltaTime * rotationSmoothSpeed);
-
-            playerRobot.transform.rotation = Quaternion.Euler(frontalTilt, bodyRotation, -lateralTilt);
-            playerWheel.transform.rotation = Quaternion.Euler(frontalTilt * 0.5f, bodyRotation, -lateralTilt * 0.5f);
-        }
-        else
-        {
-            lateralTilt = Mathf.Lerp(lateralTilt, 0.0f, Time.deltaTime * tiltResetSpeed * 100f);
-            frontalTilt = Mathf.Lerp(frontalTilt, 0.0f, Time.deltaTime * tiltResetSpeed * 100f);
-            bodyRotation = Mathf.LerpAngle(bodyRotation, targetRotation, Time.deltaTime * rotationSmoothSpeed);
-
-            playerRobot.transform.rotation = Quaternion.Euler(frontalTilt, bodyRotation, lateralTilt);
-            playerWheel.transform.rotation = Quaternion.Euler(frontalTilt * 0.5f, bodyRotation, -lateralTilt * 0.5f);
-        }
-
-        Vector3 newPlayerMovement = Quaternion.Euler(0.0f, targetRotation, 0.0f) * Vector3.forward * inputActions.playerMove.magnitude;
-
-        ballRb.AddForce(newPlayerMovement * playerSpeed);
     }
 
     private void CameraRotation()

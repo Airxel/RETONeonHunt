@@ -919,6 +919,8 @@ MonoBehaviour:
   playerSpeed: 10
   tiltFactor: 2.5
   tiltLimit: 15
+  frontalTiltSmoothSpeed: 5
+  lateralTiltSmoothSpeed: 0.1
   tiltResetSpeed: 100
   rotationSmoothSpeed: 0.5
   mainCamera: {fileID: 330585543}
@@ -1409,6 +1411,7 @@ GameObject:
   - component: {fileID: 7482977686746671790}
   - component: {fileID: 540644600385098822}
   - component: {fileID: 1601631193619828999}
+  - component: {fileID: 7482977686746671791}
   m_Layer: 0
   m_Name: Robot Body
   m_TagString: Untagged
@@ -1536,6 +1539,27 @@ Transform:
   - {fileID: 4299140098953226401}
   m_Father: {fileID: 533027217}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!95 &7482977686746671791
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4427234519588543562}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &7642183081089959491
 GameObject:
   m_ObjectHideFlags: 0
