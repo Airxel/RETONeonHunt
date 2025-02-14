@@ -9,6 +9,8 @@ public class PlayerController : MonoBehaviour
     private Rigidbody ballRb;
     private InputActions inputActions;
     [SerializeField]
+    private GameObject playerParent;
+    [SerializeField]
     private GameObject playerRobot;
     [SerializeField]
     private GameObject playerWheel;
@@ -48,12 +50,15 @@ public class PlayerController : MonoBehaviour
     private float cameraTargetPitch;
     private float targetRotation;
 
+    private Animator animator;
+
     
 
     private void Awake()
     {
         ballRb = GetComponent<Rigidbody>();
         inputActions = GetComponent<InputActions>();
+        animator = playerParent.GetComponent<Animator>();
     }
 
     private void Update()
@@ -127,6 +132,8 @@ public class PlayerController : MonoBehaviour
         if (inputActions.playerShoot)
         {
             Debug.Log("Shooting");
+
+            animator.SetTrigger("Shoot");
 
             inputActions.playerShoot = false;
         }
