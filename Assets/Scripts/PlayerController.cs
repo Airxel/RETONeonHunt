@@ -9,9 +9,7 @@ public class PlayerController : MonoBehaviour
     private Rigidbody ballRb;
     private InputActions inputActions;
     [SerializeField]
-    private GameObject playerParent;
-    [SerializeField]
-    private GameObject playerRobot;
+    private GameObject playerBody;
     [SerializeField]
     private GameObject playerWheel;
     [SerializeField]
@@ -52,19 +50,17 @@ public class PlayerController : MonoBehaviour
 
     private Animator animator;
 
-    
-
     private void Awake()
     {
         ballRb = GetComponent<Rigidbody>();
         inputActions = GetComponent<InputActions>();
-        animator = playerParent.GetComponent<Animator>();
+        animator = playerWheel.GetComponent<Animator>();
     }
 
     private void Update()
     {
         playerWheel.transform.position = ballRb.transform.position;
-        playerRobot.transform.position = new Vector3(playerWheel.transform.position.x, 1f, playerWheel.transform.position.z);
+        cameraTarget.transform.position = new Vector3(playerBody.transform.position.x, cameraTarget.transform.position.y, playerBody.transform.position.z);
     }
 
     private void FixedUpdate()
@@ -119,7 +115,7 @@ public class PlayerController : MonoBehaviour
         }
 
         //  Aplicar la rotación del cuerpo
-        playerRobot.transform.rotation = Quaternion.Euler(frontalTilt, bodyRotation, -lateralTilt);
+        playerBody.transform.rotation = Quaternion.Euler(frontalTilt, bodyRotation, -lateralTilt);
         playerWheel.transform.rotation = Quaternion.Euler(frontalTilt * 0.5f, bodyRotation, -lateralTilt * 0.5f);
 
         // Mover la bola en la dirección correcta
