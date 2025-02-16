@@ -13,40 +13,34 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private GameObject playerWheel;
     [SerializeField]
+    private float wheelRadius;
+    [SerializeField]
     private float playerSpeed = 5f;
-    private float lateralTilt;
-    private float frontalTilt;
-    private float bodyRotation;
+    private float targetRotation;
+    private float currentRotation;
+    [SerializeField]
+    private float turnSmoothTime = 0.25f;
+    private float turnSmoothVelocity;
+    [SerializeField]
+    private float rotationSmoothSpeed = 0.1f;
     [SerializeField]
     private float tiltFactor = 5f;
     [SerializeField]
     private float tiltLimit = 25f;
     [SerializeField]
-    private float frontalTiltSmoothSpeed = 5f;
+    private float tiltResetSpeed = 5f;
+    private float frontalTilt;
+    [SerializeField]
+    private float frontalTiltSmoothSpeed = 0.1f;
+    private float frontalTiltSmoothVelocity;
+    private float lateralTilt;
     [SerializeField]
     private float lateralTiltSmoothSpeed = 0.1f;
-    [SerializeField]
-    private float tiltResetSpeed = 5f;
-    private float lateralTiltVelocity = 0.0f;
-    [SerializeField]
-    private float rotationSmoothSpeed = 0.1f;
+    private float lateralTiltSmoothVelocity = 0.0f;
 
-    [Header("Cinemachine")]
+    [Header("Camera")]
     [SerializeField]
     private GameObject mainCamera;
-    [SerializeField]
-    private GameObject cameraTarget;
-    [SerializeField]
-    private float topCameraLimit = 70f;
-    [SerializeField]
-    private float bottomCameraLimit = -30f;
-    [SerializeField]
-    private float horizontalCameraLimit = 90f;
-    [SerializeField]
-    private float cameraRotationSpeed = 10f;
-    private float cameraTargetYaw;
-    private float cameraTargetPitch;
-    private float targetRotation;
 
     private Animator animator;
 
@@ -54,13 +48,13 @@ public class PlayerController : MonoBehaviour
     {
         ballRb = GetComponent<Rigidbody>();
         inputActions = GetComponent<InputActions>();
-        animator = playerWheel.GetComponent<Animator>();
+        animator = playerBody.GetComponent<Animator>();
     }
 
     private void Update()
     {
         playerWheel.transform.position = ballRb.transform.position;
-        cameraTarget.transform.position = new Vector3(playerBody.transform.position.x, cameraTarget.transform.position.y, playerBody.transform.position.z);
+        playerBody.transform.position = new Vector3(playerWheel.transform.position.x, playerBody.transform.position.y, playerWheel.transform.position.z);
     }
 
     private void FixedUpdate()
@@ -69,56 +63,41 @@ public class PlayerController : MonoBehaviour
         PlayerShooting();
     }
 
-    private void LateUpdate()
-    {
-        CameraRotation();
-    }
-
     private void PlayerMovement()
     {
         Vector3 playerMovement = new Vector3(inputActions.playerMove.x, 0.0f, inputActions.playerMove.y).normalized;
 
-        if (inputActions.playerMove.magnitude > 0.01f)
+        if (inputActions.playerMove.magnitude >= 0.1f)
         {
-            // Convertir la dirección a grados en relación a la cámara
-            targetRotation = Mathf.Atan2(playerMovement.x, playerMovement.z) * Mathf.Rad2Deg + mainCamera.transform.eulerAngles.y;
+            float newTargetRotation = Mathf.Atan2(playerMovement.x, playerMovement.z) * Mathf.Rad2Deg + mainCamera.transform.eulerAngles.y;
+
+            // Usamos SmoothDampAngle para evitar reseteos bruscos pero permitiendo cambios de dirección rápidos
+            targetRotation = Mathf.SmoothDampAngle(targetRotation, newTargetRotation, ref turnSmoothVelocity, turnSmoothTime);
+            currentRotation = Mathf.LerpAngle(currentRotation, targetRotation, Time.deltaTime * rotationSmoothSpeed);
         }
 
         Vector3 playerVelocity = ballRb.velocity;
+        float velocityMagnitude = new Vector2(playerVelocity.x, playerVelocity.z).magnitude;
 
-        float velocityMagnitude = new Vector2(playerVelocity.x, playerVelocity.z).magnitude; // Magnitud horizontal
-
-        // Suavizar la rotación del cuerpo
-        bodyRotation = Mathf.LerpAngle(bodyRotation, targetRotation, Time.deltaTime * rotationSmoothSpeed);
-
-        // Inclinación solo si hay velocidad
-        if (velocityMagnitude > 0.1f)
-        {
-            // Inclinación frontal siempre hacia adelante
+        if (playerVelocity.magnitude >= 0.1f)
+        { 
             float frontalTiltAmount = Mathf.Clamp(velocityMagnitude * tiltFactor, 0.0f, tiltLimit);
+            frontalTilt = Mathf.SmoothDamp(frontalTilt, frontalTiltAmount, ref frontalTiltSmoothVelocity, frontalTiltSmoothSpeed);
 
-            frontalTilt = Mathf.Lerp(frontalTilt, frontalTiltAmount, Time.deltaTime * frontalTiltSmoothSpeed * 10f);
-
-            // Suavizar inclinación lateral evitando saltos bruscos
-            float rotationDifference = Mathf.DeltaAngle(bodyRotation, targetRotation) * 0.05f;
-
-            float lateralTiltAmount = Mathf.Clamp(rotationDifference, -tiltLimit, tiltLimit); // Factor más bajo para suavizar
-
-            // Evitar cambios bruscos con SmoothDamp
-            lateralTilt = Mathf.SmoothDamp(lateralTilt, lateralTiltAmount, ref lateralTiltVelocity, lateralTiltSmoothSpeed);
+            float rotationDifference = Mathf.DeltaAngle(currentRotation, targetRotation);
+            float lateralTiltAmount = Mathf.Clamp(rotationDifference, -tiltLimit, tiltLimit);
+            float tiltSpeedFactor = Mathf.Clamp01(velocityMagnitude / playerSpeed);
+            lateralTilt = Mathf.SmoothDamp(lateralTilt, lateralTiltAmount * tiltSpeedFactor, ref lateralTiltSmoothVelocity, lateralTiltSmoothSpeed);
         }
         else
         {
-            // Si no se mueve, reducir inclinaciones gradualmente
-            frontalTilt = Mathf.Lerp(frontalTilt, 0.0f, Time.deltaTime * tiltResetSpeed * 100f);
-            lateralTilt = Mathf.Lerp(lateralTilt, 0.0f, Time.deltaTime * tiltResetSpeed * 100f);
+            frontalTilt = Mathf.SmoothDamp(frontalTilt, 0.0f, ref frontalTiltSmoothVelocity, tiltResetSpeed);
+            lateralTilt = Mathf.SmoothDamp(lateralTilt, 0.0f, ref lateralTiltSmoothVelocity, tiltResetSpeed);
         }
 
-        //  Aplicar la rotación del cuerpo
-        playerBody.transform.rotation = Quaternion.Euler(frontalTilt, bodyRotation, -lateralTilt);
-        playerWheel.transform.rotation = Quaternion.Euler(frontalTilt * 0.5f, bodyRotation, -lateralTilt * 0.5f);
-
-        // Mover la bola en la dirección correcta
+        playerWheel.transform.rotation = Quaternion.Euler(playerWheel.transform.rotation.eulerAngles.x, currentRotation, -lateralTilt * 0.5f);
+        playerBody.transform.rotation = Quaternion.Euler(frontalTilt, currentRotation, -lateralTilt);
+    
         Vector3 newPlayerMovement = Quaternion.Euler(0.0f, targetRotation, 0.0f) * Vector3.forward * inputActions.playerMove.magnitude;
         ballRb.AddForce(newPlayerMovement * playerSpeed);
     }
@@ -133,19 +112,5 @@ public class PlayerController : MonoBehaviour
 
             inputActions.playerShoot = false;
         }
-    }
-
-    private void CameraRotation()
-    {
-        if (inputActions.playerLook.sqrMagnitude > 0.01f)
-        {
-            cameraTargetYaw += inputActions.playerLook.x * cameraRotationSpeed * Time.deltaTime;
-            cameraTargetPitch += inputActions.playerLook.y * cameraRotationSpeed * Time.deltaTime;
-        }
-
-        cameraTargetYaw = Mathf.Clamp(cameraTargetYaw, -horizontalCameraLimit, horizontalCameraLimit);
-        cameraTargetPitch = Mathf.Clamp(cameraTargetPitch, bottomCameraLimit, topCameraLimit);
-
-        cameraTarget.transform.rotation = Quaternion.Euler(cameraTargetPitch, cameraTargetYaw, 0.0f);
     }
 }
