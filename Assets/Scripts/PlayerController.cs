@@ -14,6 +14,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private GameObject playerWheel;
     [SerializeField]
+    private GameObject playerAim;
+    [SerializeField]
     private float wheelRadius;
     [SerializeField]
     private float playerSpeed = 5f;
@@ -38,6 +40,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float lateralTiltSmoothSpeed = 0.1f;
     private float lateralTiltSmoothVelocity = 0.0f;
+    [SerializeField]
+    private float shootRange = 100f;
 
     [Header("Camera")]
     [SerializeField]
@@ -50,6 +54,7 @@ public class PlayerController : MonoBehaviour
         ballRb = GetComponent<Rigidbody>();
         inputActions = GetComponent<InputActions>();
         animator = playerBody.GetComponent<Animator>();
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     private void Update()
@@ -109,12 +114,13 @@ public class PlayerController : MonoBehaviour
         {
             animator.SetTrigger("Shoot");
 
-            Vector3 shootDirection = new Vector3(inputActions.playerMove.x, 0.0f, inputActions.playerMove.y).normalized;
+            Vector3 shootDirection = playerAim.transform.forward;
+            shootDirection.y = 0.0f;
 
-            Ray ray = new Ray(playerBody.transform.position + Vector3.forward, shootDirection);
+            Ray ray = new Ray(playerAim.transform.position, shootDirection);
             RaycastHit hit;
 
-            if (Physics.Raycast(ray, out hit, Mathf.Infinity))
+            if (Physics.Raycast(ray, out hit, shootRange))
             {
                 if (hit.collider.CompareTag("Enemy"))
                 {
@@ -124,11 +130,9 @@ public class PlayerController : MonoBehaviour
                 {
                     Debug.Log(hit.collider.name);
                 }
-                else
-                {
-                    Debug.Log("Not hitting");
-                }
             }
+
+            Debug.DrawRay(playerAim.transform.position, shootDirection * shootRange, Color.red, 1f);
 
             inputActions.playerShoot = false;
         }
