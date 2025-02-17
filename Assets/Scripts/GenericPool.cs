@@ -5,7 +5,7 @@ using UnityEngine;
 public class GenericPool : MonoBehaviour
 {
     // Se crea la variable de la pool de objetos
-    Stack<GameObject> _poll = new Stack<GameObject>();
+    Stack<GameObject> _pool = new Stack<GameObject>();
 
     [SerializeField]
     private GameObject prefabToInstantiate;
@@ -28,7 +28,7 @@ public class GenericPool : MonoBehaviour
         temporalElement.GetComponent<ProjectileBehaviour>().projectilePool = this;
 
         // Se carga la piscina con elementos
-        _poll.Push(temporalElement);
+        _pool.Push(temporalElement);
         temporalElement.SetActive(false);
 
         return temporalElement;
@@ -42,13 +42,13 @@ public class GenericPool : MonoBehaviour
     {
         GameObject toReturn = null;
 
-        if (_poll.Count == 0)
+        if (_pool.Count == 0)
         {
             CreateElement();
         }
         else
         {
-            toReturn = _poll.Pop();
+            toReturn = _pool.Pop();
         }
         return toReturn;
     }
@@ -60,6 +60,6 @@ public class GenericPool : MonoBehaviour
     public void ReturnToPool(GameObject element)
     {
         element.SetActive(false);
-        _poll.Push(element);
+        _pool.Push(element);
     }
 }

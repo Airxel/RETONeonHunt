@@ -40,12 +40,21 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float lateralTiltSmoothSpeed = 0.1f;
     private float lateralTiltSmoothVelocity = 0.0f;
-    [SerializeField]
-    private float shootRange = 100f;
 
     [Header("Camera")]
     [SerializeField]
     private GameObject mainCamera;
+
+    [Header("Shooting")]
+    public GenericPool projectilePool;
+    [SerializeField]
+    private float shootRange = 100f;
+    [SerializeField]
+    private bool rechargeReady = true;
+    [SerializeField]
+    private float rechargeCooldown = 1f;
+    private float rechargeTimer;
+
 
     private Animator animator;
 
@@ -61,6 +70,11 @@ public class PlayerController : MonoBehaviour
     {
         playerWheel.transform.position = ballRb.transform.position;
         playerBody.transform.position = new Vector3(playerWheel.transform.position.x, playerBody.transform.position.y, playerWheel.transform.position.z);
+
+        if (!rechargeReady)
+        {
+            RechargeCooldown();
+        }
     }
 
     private void FixedUpdate()
@@ -110,7 +124,7 @@ public class PlayerController : MonoBehaviour
 
     private void PlayerShooting()
     {
-        if (inputActions.playerShoot)
+        if (inputActions.playerShoot && rechargeReady)
         {
             animator.SetTrigger("Shoot");
 
@@ -132,9 +146,27 @@ public class PlayerController : MonoBehaviour
                 }
             }
 
-            Debug.DrawRay(playerAim.transform.position, shootDirection * shootRange, Color.red, 1f);
+            GameObject projectile = projectilePool.GetElementFromPool();
+            projectile.SetActive(true);
+            projectile.transform.position = playerAim.transform.position;
+            projectile.GetComponent<ProjectileBehaviour>().ProjectileDirection(shootDirection);
+
+            rechargeReady = false;
+            rechargeTimer = rechargeCooldown;
 
             inputActions.playerShoot = false;
+
+            Debug.DrawRay(playerAim.transform.position, shootDirection * shootRange, Color.red, 1f); 
+        }
+    }
+
+    private void RechargeCooldown()
+    {
+        rechargeTimer -= Time.deltaTime;
+
+        if (rechargeTimer <= 0)
+        {
+            rechargeReady = true;
         }
     }
 }
