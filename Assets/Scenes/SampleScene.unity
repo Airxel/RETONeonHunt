@@ -2425,7 +2425,6 @@ MonoBehaviour:
   playerBody: {fileID: 779839090}
   playerWheel: {fileID: 485026585432303194}
   playerAim: {fileID: 1666244980}
-  wheelRadius: 0.875
   playerSpeed: 10
   turnSmoothTime: 0.05
   rotationSmoothSpeed: 1.25
@@ -2439,7 +2438,7 @@ MonoBehaviour:
   shootRange: 100
   rechargeReady: 1
   rechargeCooldown: 1.25
-  rechargeTimer: 0
+  detectionRadius: 25
 --- !u!135 &2095990577
 SphereCollider:
   m_ObjectHideFlags: 0

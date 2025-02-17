@@ -4,24 +4,33 @@ using UnityEngine;
 
 public class ProjectileBehaviour : MonoBehaviour
 {
+    [Header("Projectile")]
     public GenericPool projectilePool;
     private Vector3 projectileDirection;
-    float timer = 5f;
-
     [SerializeField]
-    float speed = 2f;
+    private Transform projectileTarget;
+    [SerializeField]
+    float speed = 10f;
+    [SerializeField]
+    private float homingStrength = 10f;
+    [SerializeField]
+    private float lifetime = 5f;
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
+        if (projectileTarget != null)
+        {
+            projectileDirection = (projectileTarget.position - transform.position).normalized;
+            transform.forward = Vector3.Lerp(transform.forward, projectileDirection, homingStrength * Time.deltaTime);
+        }
+
         transform.position += projectileDirection * speed * Time.deltaTime;
 
-        timer -= Time.deltaTime;
+        lifetime -= Time.deltaTime;
 
-        if (timer < 0)
+        if (lifetime <= 0)
         {
             projectilePool.ReturnToPool(gameObject);
-            timer = 5f;
         }
     }
 
@@ -29,7 +38,14 @@ public class ProjectileBehaviour : MonoBehaviour
     {
         projectileDirection = direction.normalized;
         transform.forward = direction;
-        timer = 5f;
+        lifetime = 5f;
+        projectileTarget = null;
+    }
+
+    public void ProjectileTarget(Transform newProjectileTarget)
+    {
+        projectileTarget = newProjectileTarget;
+        lifetime = 5f;
     }
 
     private void OnTriggerEnter(Collider other)
