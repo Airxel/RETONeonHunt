@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
@@ -106,9 +107,28 @@ public class PlayerController : MonoBehaviour
     {
         if (inputActions.playerShoot)
         {
-            Debug.Log("Shooting");
-
             animator.SetTrigger("Shoot");
+
+            Vector3 shootDirection = new Vector3(inputActions.playerMove.x, 0.0f, inputActions.playerMove.y).normalized;
+
+            Ray ray = new Ray(playerBody.transform.position + Vector3.forward, shootDirection);
+            RaycastHit hit;
+
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity))
+            {
+                if (hit.collider.CompareTag("Enemy"))
+                {
+                    Debug.Log(hit.collider.name);
+                }
+                else if (hit.collider.CompareTag("Obstacle"))
+                {
+                    Debug.Log(hit.collider.name);
+                }
+                else
+                {
+                    Debug.Log("Not hitting");
+                }
+            }
 
             inputActions.playerShoot = false;
         }
