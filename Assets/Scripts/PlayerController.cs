@@ -79,7 +79,7 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         playerWheel.transform.position = ballRb.transform.position;
-        playerBody.transform.position = new Vector3(playerWheel.transform.position.x, playerBody.transform.position.y, playerWheel.transform.position.z);
+        playerBody.transform.position = playerWheel.transform.position;
 
         if (!rechargeReady)
         {
