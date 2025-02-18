@@ -70,7 +70,7 @@ public class PlayerController : MonoBehaviour
         animator = playerBody.GetComponent<Animator>();
         wheelRenderer = playerWheel.GetComponent<Renderer>();
         wheelMaterials = wheelRenderer.materials;
-        //Cursor.lockState = CursorLockMode.Locked;
+        UnityEngine.Cursor.lockState = CursorLockMode.Locked;
     }
 
     private void Start()
@@ -153,20 +153,18 @@ public class PlayerController : MonoBehaviour
         {
             animator.SetTrigger("Shoot");
 
+            GameObject projectile = projectilePool.GetElementFromPool();
+            projectile.SetActive(true);
+            projectile.transform.position = playerAim.transform.position;
+
             Transform targetEnemy = SelectEnemy();
+            ProjectileBehaviour projectileBehaviour = projectile.GetComponent<ProjectileBehaviour>();
 
             if (targetEnemy != null)
             {
                 Vector3 shootDirection = (targetEnemy.position - playerAim.transform.position).normalized;
 
-                GameObject projectile = projectilePool.GetElementFromPool();
-                projectile.SetActive(true);
-                projectile.transform.position = playerAim.transform.position;
-
-                projectile.GetComponent<ProjectileBehaviour>().ProjectileTarget(targetEnemy);
-
-                rechargeReady = false;
-                rechargeTimer = rechargeCooldown;
+                projectileBehaviour.ProjectileTarget(targetEnemy);  
 
                 Debug.DrawRay(playerAim.transform.position, shootDirection * shootRange, Color.red, 1f);
             }
@@ -175,14 +173,13 @@ public class PlayerController : MonoBehaviour
                 Vector3 shootDirection = playerAim.transform.forward;
                 shootDirection.y = 0.0f;
 
-                GameObject projectile = projectilePool.GetElementFromPool();
-                projectile.SetActive(true);
-                projectile.transform.position = playerAim.transform.position;
-
-                projectile.GetComponent<ProjectileBehaviour>().ProjectileDirection(shootDirection);
+                projectileBehaviour.ProjectileDirection(shootDirection);
 
                 Debug.DrawRay(playerAim.transform.position, shootDirection * shootRange, Color.green, 1f);
             }
+
+            rechargeReady = false;
+            rechargeTimer = rechargeCooldown;
 
             inputActions.playerShoot = false; 
         }
@@ -193,18 +190,17 @@ public class PlayerController : MonoBehaviour
         Collider[] enemyColliders = Physics.OverlapSphere(playerBody.transform.position, detectionRadius);
 
         Transform nearestEnemy = null;
-        float closestDistance = Mathf.Infinity;
+        float detectionArea = detectionRadius;
 
         foreach (var collider in enemyColliders)
         {
             if (collider.CompareTag("Enemy"))
             {
-                Vector3 screenPosition = Camera.main.WorldToScreenPoint(collider.transform.position);
-                float distanceToCenter = Vector2.Distance(new Vector2(Screen.width / 2, Screen.height / 2), new Vector2(screenPosition.x, screenPosition.y));
+                float distanceToEnemy = Vector3.Distance(playerBody.transform.position, collider.transform.position);
 
-                if (distanceToCenter < closestDistance)
+                if (distanceToEnemy < detectionArea)
                 {
-                    closestDistance = distanceToCenter;
+                    detectionArea = distanceToEnemy;
                     nearestEnemy = collider.transform;
                 }
             }
