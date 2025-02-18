@@ -52,14 +52,12 @@ public class PlayerController : MonoBehaviour
     [Header("Shooting")]
     public GenericPool projectilePool;
     [SerializeField]
-    private float shootRange = 100f;
-    [SerializeField]
     private bool rechargeReady = true;
     [SerializeField]
-    private float rechargeCooldown = 1f;
+    private float rechargeCooldown = 1.5f;
     private float rechargeTimer;
     [SerializeField]
-    private float detectionRadius = 5f;
+    private float detectionRadius = 25f;
 
     private Animator animator;
 
@@ -153,11 +151,12 @@ public class PlayerController : MonoBehaviour
         {
             animator.SetTrigger("Shoot");
 
+            Transform targetEnemy = SelectEnemy();
+
             GameObject projectile = projectilePool.GetElementFromPool();
             projectile.SetActive(true);
             projectile.transform.position = playerAim.transform.position;
-
-            Transform targetEnemy = SelectEnemy();
+            
             ProjectileBehaviour projectileBehaviour = projectile.GetComponent<ProjectileBehaviour>();
 
             if (targetEnemy != null)
@@ -166,7 +165,7 @@ public class PlayerController : MonoBehaviour
 
                 projectileBehaviour.ProjectileTarget(targetEnemy);  
 
-                Debug.DrawRay(playerAim.transform.position, shootDirection * shootRange, Color.red, 1f);
+                Debug.DrawRay(playerAim.transform.position, shootDirection * 100f, Color.red, 1f);
             }
             else
             {
@@ -175,7 +174,7 @@ public class PlayerController : MonoBehaviour
 
                 projectileBehaviour.ProjectileDirection(shootDirection);
 
-                Debug.DrawRay(playerAim.transform.position, shootDirection * shootRange, Color.green, 1f);
+                Debug.DrawRay(playerAim.transform.position, shootDirection * 100f, Color.green, 1f);
             }
 
             rechargeReady = false;
@@ -190,7 +189,7 @@ public class PlayerController : MonoBehaviour
         Collider[] enemyColliders = Physics.OverlapSphere(playerBody.transform.position, detectionRadius);
 
         Transform nearestEnemy = null;
-        float detectionArea = detectionRadius;
+        float detectionArea = Mathf.Infinity;
 
         foreach (var collider in enemyColliders)
         {
@@ -221,44 +220,6 @@ public class PlayerController : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.DrawSphere(playerBody.transform.position, detectionRadius);
-    }
-
-    private void PlayerShooting2()
-    {
-        if (inputActions.playerShoot && rechargeReady)
-        {
-            animator.SetTrigger("Shoot");
-
-            Vector3 shootDirection = playerAim.transform.forward;
-            shootDirection.y = 0.0f;
-
-            Ray ray = new Ray(playerAim.transform.position, shootDirection);
-            RaycastHit hit;
-
-            if (Physics.Raycast(ray, out hit, shootRange))
-            {
-                if (hit.collider.CompareTag("Enemy"))
-                {
-                    Debug.Log(hit.collider.name);
-                }
-                else if (hit.collider.CompareTag("Obstacle"))
-                {
-                    Debug.Log(hit.collider.name);
-                }
-            }
-
-            GameObject projectile = projectilePool.GetElementFromPool();
-            projectile.SetActive(true);
-            projectile.transform.position = playerAim.transform.position;
-            projectile.GetComponent<ProjectileBehaviour>().ProjectileDirection(shootDirection);
-
-            rechargeReady = false;
-            rechargeTimer = rechargeCooldown;
-
-            inputActions.playerShoot = false;
-
-            Debug.DrawRay(playerAim.transform.position, shootDirection * shootRange, Color.red, 1f);
-        }
+        Gizmos.DrawWireSphere(playerBody.transform.position, detectionRadius);
     }
 }

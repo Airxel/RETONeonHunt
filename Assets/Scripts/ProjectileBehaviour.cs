@@ -10,11 +10,12 @@ public class ProjectileBehaviour : MonoBehaviour
     [SerializeField]
     private Transform projectileTarget;
     [SerializeField]
-    float speed = 10f;
+    float projectileSpeed = 10f;
     [SerializeField]
     private float homingStrength = 10f;
     [SerializeField]
     private float lifetime = 5f;
+    private float currentLifetime;
 
     private void Update()
     {
@@ -24,28 +25,27 @@ public class ProjectileBehaviour : MonoBehaviour
             transform.forward = Vector3.Lerp(transform.forward, projectileDirection, homingStrength * Time.deltaTime);
         }
 
-        transform.position += projectileDirection * speed * Time.deltaTime;
+        transform.position += projectileDirection * projectileSpeed * Time.deltaTime;
 
-        lifetime -= Time.deltaTime;
+        currentLifetime -= Time.deltaTime;
 
-        if (lifetime <= 0)
+        if (currentLifetime <= 0)
         {
             projectilePool.ReturnToPool(gameObject);
         }
     }
 
-    public void ProjectileDirection(Vector3 direction)
+    public void ProjectileDirection(Vector3 shootDirection)
     {
-        projectileDirection = direction.normalized;
-        transform.forward = direction;
-        lifetime = 5f;
+        projectileDirection = shootDirection;
+        currentLifetime = lifetime;
         projectileTarget = null;
     }
 
     public void ProjectileTarget(Transform newProjectileTarget)
     {
         projectileTarget = newProjectileTarget;
-        lifetime = 5f;
+        currentLifetime = lifetime;
     }
 
     private void OnTriggerEnter(Collider other)
