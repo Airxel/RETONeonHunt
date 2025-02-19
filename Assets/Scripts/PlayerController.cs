@@ -138,7 +138,7 @@ public class PlayerController : MonoBehaviour
         float velocityMagnitude = new Vector3(ballRb.velocity.x, 0.0f, ballRb.velocity.z).magnitude;
         float colorChangeSpeed = Mathf.Clamp01(velocityMagnitude / playerSpeed);
 
-        Color newColor = Color.Lerp(originalColor, Color.white, colorChangeSpeed);
+        Color newColor = Color.Lerp(originalColor, Color.red, colorChangeSpeed);
 
         wheelMaterials[materialIndex].color = newColor;
 
