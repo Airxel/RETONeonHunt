@@ -22,7 +22,7 @@ public class ProjectileBehaviour : MonoBehaviour
         if (projectileTarget != null)
         {
             projectileDirection = (projectileTarget.position - transform.position).normalized;
-            transform.forward = Vector3.Lerp(transform.forward, projectileDirection, homingStrength * Time.deltaTime);
+            transform.forward = Vector3.Lerp(transform.forward, projectileDirection + Vector3.up, homingStrength * Time.deltaTime);
         }
 
         transform.position += projectileDirection * projectileSpeed * Time.deltaTime;

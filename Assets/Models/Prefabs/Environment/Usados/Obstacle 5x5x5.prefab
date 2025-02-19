@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 4521563920089929283}
   - component: {fileID: 629756612136500708}
   - component: {fileID: 1816604421502120371}
-  - component: {fileID: 6563127770919999796}
   - component: {fileID: 9201704141792196422}
   - component: {fileID: 7270275214624220210}
   m_Layer: 6
@@ -821,7 +820,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 3874
+  m_VersionIndex: 3880
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -897,14 +896,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &6563127770919999796
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7212970873520222739}
-  m_Mesh: {fileID: 0}
 --- !u!64 &9201704141792196422
 MeshCollider:
   m_ObjectHideFlags: 0

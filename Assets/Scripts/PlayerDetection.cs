@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class PlayerDetection : MonoBehaviour
 {
@@ -24,7 +25,7 @@ public class PlayerDetection : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.transform == playerRobot)
+        if (other.CompareTag("Player"))
         {
             isPlayerInVision = true;
         }
@@ -32,7 +33,7 @@ public class PlayerDetection : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.transform == playerRobot)
+        if (other.CompareTag("Player"))
         {
             isPlayerInVision = false;
         }
@@ -47,12 +48,21 @@ public class PlayerDetection : MonoBehaviour
             Ray ray = new Ray(transform.position + Vector3.up, povDirection);
             RaycastHit hit;
 
-            if (Physics.Raycast(ray, out hit))
+            if (Physics.Raycast(ray, out hit, ~LayerMask.GetMask("Ignore Raycast")))
             {
-                if (hit.collider.transform == playerRobot)
+                if (hit.collider.CompareTag("Player"))
                 {
                     playerController.position = startingPosition;
+
+                    Debug.DrawRay(transform.position + Vector3.up, povDirection * 100f, Color.yellow, 3f);
                 }
+                else
+                {
+                    Debug.DrawRay(transform.position + Vector3.up, povDirection * 100f, Color.blue, 3f);
+                }
+                
+                Debug.Log("Raycast hit: " + hit.collider.gameObject.name);
+
             }
         }
     }
