@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
 using UnityEngine.UIElements;
 
 public class PlayerController : MonoBehaviour
@@ -16,11 +17,12 @@ public class PlayerController : MonoBehaviour
     private GameObject playerWheel;
     [SerializeField]
     private GameObject playerAim;
-    [SerializeField]
-    private int materialIndex = 2;
-    private Color originalColor;
-    private Renderer wheelRenderer;
+    private MeshRenderer wheelRenderer;
     private Material[] wheelMaterials;
+    private Color movingNeonColor;
+    private Color movingNeonEmission;
+    [SerializeField]
+    private float colorChangeSpeed;
     [SerializeField]
     private float playerSpeed = 5f;
     private float targetRotation;
@@ -66,14 +68,15 @@ public class PlayerController : MonoBehaviour
         ballRb = GetComponent<Rigidbody>();
         inputActions = GetComponent<InputActions>();
         animator = playerBody.GetComponent<Animator>();
-        wheelRenderer = playerWheel.GetComponent<Renderer>();
+        wheelRenderer = playerWheel.GetComponent<MeshRenderer>();
         wheelMaterials = wheelRenderer.materials;
         UnityEngine.Cursor.lockState = CursorLockMode.Locked;
     }
 
     private void Start()
     {
-        originalColor = wheelMaterials[materialIndex].color;
+        movingNeonColor = wheelMaterials[2].color;
+        movingNeonEmission = wheelMaterials[2].GetColor("_EmissionColor");
     }
 
     private void Update()
@@ -136,11 +139,15 @@ public class PlayerController : MonoBehaviour
     private void WheelColor()
     {
         float velocityMagnitude = new Vector3(ballRb.velocity.x, 0.0f, ballRb.velocity.z).magnitude;
-        float colorChangeSpeed = Mathf.Clamp01(velocityMagnitude / playerSpeed);
+        colorChangeSpeed = Mathf.Clamp01(velocityMagnitude / playerSpeed * 2f);
 
-        Color newColor = Color.Lerp(originalColor, Color.red, colorChangeSpeed);
+        Color newNeonColor = Color.Lerp(Color.black, movingNeonColor, colorChangeSpeed);
+        Color newNeonEmission = Color.Lerp(Color.black, movingNeonEmission, colorChangeSpeed);
+        Color newDetailsColor = Color.Lerp(Color.black, movingNeonColor, colorChangeSpeed);
 
-        wheelMaterials[materialIndex].color = newColor;
+        wheelMaterials[2].SetColor("_BaseColor", newNeonColor);
+        wheelMaterials[2].SetColor("_EmissionColor", newNeonEmission);
+        wheelMaterials[1].SetColor("_BaseColor", newDetailsColor);
 
         wheelRenderer.materials = wheelMaterials;
     }
