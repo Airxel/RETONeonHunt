@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1297543281156611280}
   - component: {fileID: 7367577695101858931}
   - component: {fileID: 8600584042391393785}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Enemy POV
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -83,7 +83,7 @@ GameObject:
   - component: {fileID: 3219112117559892538}
   - component: {fileID: 5325014208905919473}
   - component: {fileID: 8174436198624996279}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Enemy Robot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -116,12 +116,12 @@ NavMeshAgent:
   m_GameObject: {fileID: 6559550689452575394}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 1.1
+  m_Radius: 1.25
   m_Speed: 5
-  m_Acceleration: 8
+  m_Acceleration: 10
   avoidancePriority: 50
-  m_AngularSpeed: 120
-  m_StoppingDistance: 0.2
+  m_AngularSpeed: 180
+  m_StoppingDistance: 0.1
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
@@ -155,6 +155,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Robot Daria
+      objectReference: {fileID: 0}
+    - target: {fileID: 1617806258515498740, guid: ee411fcd0c8b10e4b9a5b162e8e1e892,
+        type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 1617806258515498740, guid: ee411fcd0c8b10e4b9a5b162e8e1e892,
         type: 3}
@@ -215,6 +220,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6401057700881088930, guid: ee411fcd0c8b10e4b9a5b162e8e1e892,
+        type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 8727013517254851530, guid: ee411fcd0c8b10e4b9a5b162e8e1e892,
+        type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

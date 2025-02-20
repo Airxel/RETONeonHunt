@@ -202,12 +202,17 @@ public class PlayerController : MonoBehaviour
         {
             if (collider.CompareTag("Enemy"))
             {
+                Vector3 enemyPosition = collider.transform.position + Vector3.up;
                 float distanceToEnemy = Vector3.Distance(playerBody.transform.position, collider.transform.position + Vector3.up);
 
-                if (distanceToEnemy < detectionArea)
+                // Verificar si hay un obstáculo entre el jugador y el enemigo
+                if (!Physics.Linecast(playerBody.transform.position, enemyPosition, LayerMask.GetMask("Environment")))
                 {
-                    detectionArea = distanceToEnemy;
-                    nearestEnemy = collider.transform;
+                    if (distanceToEnemy < detectionArea)
+                    {
+                        detectionArea = distanceToEnemy;
+                        nearestEnemy = collider.transform;
+                    }
                 }
             }
         }

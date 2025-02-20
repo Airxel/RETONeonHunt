@@ -9,6 +9,7 @@ public class EnemyPatrol : MonoBehaviour
     private NavMeshAgent navMeshAgent;
     [SerializeField]
     private Transform[] patrolPoints;
+    [SerializeField]
     private int currentPatrolPointIndex;
 
     private void Start()
@@ -23,7 +24,7 @@ public class EnemyPatrol : MonoBehaviour
 
     private void EnemyPatrolPathing()
     {
-        if (navMeshAgent.remainingDistance < navMeshAgent.stoppingDistance)
+        if (!navMeshAgent.pathPending && navMeshAgent.remainingDistance < navMeshAgent.stoppingDistance)
         {
             currentPatrolPointIndex = (currentPatrolPointIndex + 1) % patrolPoints.Length;
 
