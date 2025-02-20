@@ -24,10 +24,15 @@ public class PlayerDetection : MonoBehaviour
     private void Start()
     {
         startingPosition = playerController.position;
+
+        
     }
 
     private void Update()
     {
+        detectionCollider.center = new Vector3(detectionColliderRange / 2, detectionCollider.center.y, detectionCollider.center.z);
+        detectionCollider.height = detectionColliderRange;
+
         PlayerDetectionSystem();
     }
 
