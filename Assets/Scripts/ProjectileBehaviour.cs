@@ -22,7 +22,7 @@ public class ProjectileBehaviour : MonoBehaviour
         if (projectileTarget != null)
         {
             projectileDirection = (projectileTarget.position - transform.position).normalized;
-            transform.forward = Vector3.Lerp(transform.forward, projectileDirection + Vector3.up, homingStrength * Time.deltaTime);
+            transform.forward = Vector3.Lerp(transform.forward, projectileDirection, homingStrength * Time.deltaTime);
         }
 
         transform.position += projectileDirection * projectileSpeed * Time.deltaTime;
@@ -50,11 +50,15 @@ public class ProjectileBehaviour : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Enemy") || other.CompareTag("Obstacle"))
+        if (other.CompareTag("Enemy"))
         {
-            Debug.Log("Projectile hit: " + other.tag);
+            GameObject enemyInstance = other.transform.parent.gameObject;
 
-            projectilePool.ReturnToPool(gameObject);
+            enemyInstance.SetActive(false);
         }
+
+        projectilePool.ReturnToPool(gameObject);
+
+        Debug.Log("Projectile hit: " + other.tag);
     }
 }

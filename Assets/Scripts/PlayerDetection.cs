@@ -5,13 +5,21 @@ using UnityEngine.UIElements;
 
 public class PlayerDetection : MonoBehaviour
 {
+    private CapsuleCollider detectionCollider;
     [SerializeField]
     private Transform playerController;
     [SerializeField]
     private Transform playerRobot;
     [SerializeField]
+    private float detectionColliderRange = 20f;
+    [SerializeField]
     private bool isPlayerInVision;
     private Vector3 startingPosition;
+
+    private void Awake()
+    {
+        detectionCollider = GetComponent<CapsuleCollider>();
+    }
 
     private void Start()
     {
@@ -25,7 +33,7 @@ public class PlayerDetection : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.transform == playerRobot)
         {
             isPlayerInVision = true;
         }
@@ -33,7 +41,7 @@ public class PlayerDetection : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.transform == playerRobot)
         {
             isPlayerInVision = false;
         }
@@ -43,14 +51,14 @@ public class PlayerDetection : MonoBehaviour
     {
         if (isPlayerInVision)
         {
-            Vector3 povDirection = (playerRobot.position - transform.position).normalized;
+            Vector3 povDirection = playerRobot.position - transform.position + Vector3.up;
 
-            Ray ray = new Ray(transform.position + Vector3.up, povDirection);
+            Ray ray = new Ray(transform.position, povDirection);
             RaycastHit hit;
 
-            if (Physics.Raycast(ray, out hit, ~LayerMask.GetMask("Ignore Raycast")))
+            if (Physics.Raycast(ray, out hit))
             {
-                if (hit.collider.CompareTag("Player"))
+                if (hit.collider.transform == playerRobot)
                 {
                     playerController.position = startingPosition;
 

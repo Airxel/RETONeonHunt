@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: -784540311316308738}
   m_Layer: 0
   m_Name: Projectile Example
-  m_TagString: Untagged
+  m_TagString: Projectile
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -120,6 +120,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   projectilePool: {fileID: 0}
   projectileTarget: {fileID: 0}
-  projectileSpeed: 10
+  projectileSpeed: 15
   homingStrength: 10
   lifetime: 5

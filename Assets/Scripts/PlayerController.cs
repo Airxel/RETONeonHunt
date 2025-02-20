@@ -202,7 +202,7 @@ public class PlayerController : MonoBehaviour
         {
             if (collider.CompareTag("Enemy"))
             {
-                float distanceToEnemy = Vector3.Distance(playerBody.transform.position, collider.transform.position);
+                float distanceToEnemy = Vector3.Distance(playerBody.transform.position, collider.transform.position + Vector3.up);
 
                 if (distanceToEnemy < detectionArea)
                 {
