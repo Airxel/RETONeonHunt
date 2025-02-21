@@ -60,6 +60,8 @@ public class PlayerController : MonoBehaviour
     private float rechargeTimer;
     [SerializeField]
     private float detectionRadius = 25f;
+    [SerializeField]
+    private float shootingDecreasingPoints = 5f;
 
     private Animator animator;
 
@@ -186,6 +188,8 @@ public class PlayerController : MonoBehaviour
 
             rechargeReady = false;
             rechargeTimer = rechargeCooldown;
+
+            UIManager.instance.ScoreManager(shootingDecreasingPoints);
 
             inputActions.playerShoot = false; 
         }

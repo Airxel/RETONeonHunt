@@ -16,6 +16,8 @@ public class ProjectileBehaviour : MonoBehaviour
     [SerializeField]
     private float lifetime = 5f;
     private float currentLifetime;
+    [SerializeField]
+    private float enemyIncreasingPoints = 10f;
 
     private void Update()
     {
@@ -55,6 +57,8 @@ public class ProjectileBehaviour : MonoBehaviour
             GameObject enemyInstance = other.transform.parent.gameObject;
 
             enemyInstance.SetActive(false);
+
+            UIManager.instance.ScoreManager(enemyIncreasingPoints);
         }
 
         projectilePool.ReturnToPool(gameObject);
