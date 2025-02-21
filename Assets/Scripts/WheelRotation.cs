@@ -8,14 +8,18 @@ public class WheelRotation : MonoBehaviour
     [SerializeField]
     private NavMeshAgent enemyAgent;
     [SerializeField]
-    private float rotationSpeedFactor = 0.1f;
+    private float rotationSpeedFactor;
     [SerializeField]
     private float rotationSpeed;
 
-    private void Update()
+    private void Start()
     {
         rotationSpeed = enemyAgent.speed;
+        rotationSpeedFactor = rotationSpeed * 10f;
+    }
 
+    private void Update()
+    {
         transform.Rotate(Vector3.down, rotationSpeedFactor * rotationSpeed * Time.deltaTime);
     }
 }

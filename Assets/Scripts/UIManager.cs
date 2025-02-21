@@ -10,6 +10,10 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private float finalScore;
     [SerializeField]
+    private float addedPoints;
+    [SerializeField]
+    private float timerPoints;
+    [SerializeField]
     private string gameTimerCountdown;
     private bool isGameRunning = true;
 
@@ -33,6 +37,7 @@ public class UIManager : MonoBehaviour
         isGameRunning = true;
 
         gameTimer = gameTime * 60f;
+        timerPoints = (gameTimer * 10f);
         finalScore = 0f;
     }
 
@@ -47,13 +52,15 @@ public class UIManager : MonoBehaviour
 
     public void ScoreManager(float points)
     {
-        finalScore = (gameTimer * 10f) + points;
+        addedPoints += points;
+        finalScore = addedPoints + timerPoints;
         finalScore = Mathf.Round((finalScore * 1000f) / 1000f);
     }
 
     public void GameTimer()
     {
         gameTimer -= Time.deltaTime;
+        timerPoints -= Time.deltaTime;
 
         int minutes = Mathf.FloorToInt(gameTimer / 60f);
         int seconds = Mathf.FloorToInt(gameTimer % 60f);

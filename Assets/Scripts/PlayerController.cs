@@ -9,6 +9,7 @@ using UnityEngine.UIElements;
 public class PlayerController : MonoBehaviour
 {
     [Header("Player")]
+    private Animator animator;
     private Rigidbody ballRb;
     private InputActions inputActions;
     [SerializeField]
@@ -61,9 +62,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float detectionRadius = 25f;
     [SerializeField]
-    private float shootingDecreasingPoints = 5f;
+    private float shootingDecreasingPoints = -5f;
 
-    private Animator animator;
+    [Header("Effects")]
+    [SerializeField]
+    private GameObject cubeBurstParticles;
 
     private void Awake()
     {
@@ -84,7 +87,7 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         playerWheel.transform.position = ballRb.transform.position;
-        playerBody.transform.position = playerWheel.transform.position;
+        playerBody.transform.position = new Vector3 (playerWheel.transform.position.x, playerWheel.transform.position.y + 0.075f, playerWheel.transform.position.z);
 
         if (!rechargeReady)
         {
@@ -105,6 +108,13 @@ public class PlayerController : MonoBehaviour
         if (inputActions.playerMove.magnitude >= 0.1f)
         {
             float newTargetRotation = Mathf.Atan2(playerMovement.x, playerMovement.z) * Mathf.Rad2Deg + mainCamera.transform.eulerAngles.y;
+
+            targetRotation = Mathf.SmoothDampAngle(targetRotation, newTargetRotation, ref turnSmoothVelocity, turnSmoothTime);
+            currentRotation = Mathf.LerpAngle(currentRotation, targetRotation, Time.deltaTime * rotationSmoothSpeed);
+        }
+        else
+        {
+            float newTargetRotation = mainCamera.transform.eulerAngles.y;
 
             targetRotation = Mathf.SmoothDampAngle(targetRotation, newTargetRotation, ref turnSmoothVelocity, turnSmoothTime);
             currentRotation = Mathf.LerpAngle(currentRotation, targetRotation, Time.deltaTime * rotationSmoothSpeed);
@@ -232,6 +242,21 @@ public class PlayerController : MonoBehaviour
         {
             rechargeReady = true;
         }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Obstacle"))
+        {
+            ContactPoint collisionPoint = collision.contacts[0];
+            Vector3 spawnPosition = collisionPoint.point + collisionPoint.normal * 0.5f;
+
+            Instantiate(cubeBurstParticles, spawnPosition + Vector3.up * 1.5f, Quaternion.identity);
+
+            Debug.Log("Obstacle hit: " + collision.gameObject.tag);
+        }
+
+        Debug.Log("OUCH!");
     }
 
     private void OnDrawGizmos()
