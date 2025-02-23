@@ -175,7 +175,8 @@ public class PlayerController : MonoBehaviour
             GameObject projectile = projectilePool.GetElementFromPool();
             projectile.SetActive(true);
             projectile.transform.position = playerAim.transform.position;
-            
+            projectile.transform.rotation = playerAim.transform.rotation;
+
             ProjectileBehaviour projectileBehaviour = projectile.GetComponent<ProjectileBehaviour>();
 
             if (targetEnemy != null)
@@ -188,7 +189,7 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
-                Vector3 shootDirection = playerAim.transform.forward;
+                Vector3 shootDirection = projectile.transform.forward;
                 shootDirection.y = 0.0f;
 
                 projectileBehaviour.ProjectileDirection(shootDirection);

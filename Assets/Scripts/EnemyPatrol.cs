@@ -15,6 +15,7 @@ public class EnemyPatrol : MonoBehaviour
     private void Start()
     {
         navMeshAgent.SetDestination(patrolPoints[0].position);
+        UIManager.instance.EnemiesManager(1);
     }
 
     private void Update()

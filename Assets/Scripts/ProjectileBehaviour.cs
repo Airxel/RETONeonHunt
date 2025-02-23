@@ -10,7 +10,7 @@ public class ProjectileBehaviour : MonoBehaviour
     [SerializeField]
     private Transform projectileTarget;
     [SerializeField]
-    float projectileSpeed = 10f;
+    float projectileSpeed = 15f;
     [SerializeField]
     private float homingStrength = 10f;
     [SerializeField]
@@ -23,10 +23,11 @@ public class ProjectileBehaviour : MonoBehaviour
     {
         if (projectileTarget != null)
         {
-            projectileDirection = (projectileTarget.position - transform.position).normalized;
-            transform.forward = Vector3.Lerp(transform.forward, projectileDirection, homingStrength * Time.deltaTime);
+            Vector3 targetDirection = (projectileTarget.position - transform.position).normalized;
+            projectileDirection = Vector3.Lerp(transform.forward, targetDirection, homingStrength * Time.deltaTime);
         }
 
+        transform.forward = projectileDirection;
         transform.position += projectileDirection * projectileSpeed * Time.deltaTime;
 
         currentLifetime -= Time.deltaTime;
@@ -59,6 +60,7 @@ public class ProjectileBehaviour : MonoBehaviour
             enemyInstance.SetActive(false);
 
             UIManager.instance.ScoreManager(enemyIncreasingPoints);
+            UIManager.instance.EnemiesManager(-1);
         }
 
         projectilePool.ReturnToPool(gameObject);
