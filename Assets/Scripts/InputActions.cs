@@ -9,8 +9,6 @@ public class InputActions : MonoBehaviour
     public Vector2 playerLook;
     public bool playerShoot;
 
-    public bool analogMovement;
-
     public void OnMove(InputValue movementValue)
     {
         MoveInput(movementValue.Get<Vector2>());

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace StarterAssets
 {
@@ -7,6 +8,7 @@ namespace StarterAssets
 
         [Header("Output")]
         public InputActions inputActions;
+        public PlayerInput playerInput;
 
         public void VirtualMoveInput(Vector2 virtualMoveDirection)
         {
@@ -15,6 +17,7 @@ namespace StarterAssets
 
         public void VirtualLookInput(Vector2 virtualLookDirection)
         {
+            Debug.Log($"Joystick Virtual Look Input: {virtualLookDirection}");
             inputActions.LookInput(virtualLookDirection);
         }
 

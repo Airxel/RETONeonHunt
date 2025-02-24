@@ -72,7 +72,7 @@ public class PlayerController : MonoBehaviour
         animator = playerBody.GetComponent<Animator>();
         wheelRenderer = playerWheel.GetComponent<MeshRenderer>();
         wheelMaterials = wheelRenderer.materials;
-        //UnityEngine.Cursor.lockState = CursorLockMode.Locked;
+        UnityEngine.Cursor.lockState = CursorLockMode.Locked;
     }
 
     private void Start()
