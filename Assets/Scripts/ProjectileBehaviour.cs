@@ -19,6 +19,10 @@ public class ProjectileBehaviour : MonoBehaviour
     [SerializeField]
     private float enemyIncreasingPoints = 10f;
 
+    [Header("Effects")]
+    [SerializeField]
+    private GameObject cubeBurstParticles;
+
     private void Update()
     {
         if (projectileTarget != null)
@@ -57,12 +61,19 @@ public class ProjectileBehaviour : MonoBehaviour
         {
             GameObject enemyInstance = other.transform.parent.gameObject;
 
+            Vector3 spawnPosition = other.transform.position + Vector3.up;
+            Instantiate(cubeBurstParticles, spawnPosition, Quaternion.identity);
             enemyInstance.SetActive(false);
 
             UIManager.instance.ScoreManager(enemyIncreasingPoints);
             UIManager.instance.EnemiesManager(-1);
         }
-
+        else if (other.CompareTag("Obstacle"))
+        {
+            Vector3 spawnPosition = other.ClosestPoint(transform.position);
+            Instantiate(cubeBurstParticles, spawnPosition, Quaternion.identity);
+        }
+        
         projectilePool.ReturnToPool(gameObject);
 
         Debug.Log("Projectile hit: " + other.tag);

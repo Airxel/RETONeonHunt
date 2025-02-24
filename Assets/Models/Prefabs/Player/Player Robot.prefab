@@ -796,8 +796,11 @@ MonoBehaviour:
   projectilePool: {fileID: 0}
   rechargeReady: 1
   rechargeCooldown: 1.5
+  rechargeTimer: 0
   detectionRadius: 25
   shootingDecreasingPoints: -5
+  readyColor: {r: 0.4046818, g: 0, b: 0.90683264, a: 1}
+  cooldownColor: {r: 1, g: 1, b: 1, a: 0}
 --- !u!114 &6778672475367832430
 MonoBehaviour:
   m_ObjectHideFlags: 0

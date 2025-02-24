@@ -58,15 +58,12 @@ public class PlayerController : MonoBehaviour
     private bool rechargeReady = true;
     [SerializeField]
     private float rechargeCooldown = 1.5f;
+    [SerializeField]
     private float rechargeTimer;
     [SerializeField]
     private float detectionRadius = 25f;
     [SerializeField]
     private float shootingDecreasingPoints = -5f;
-
-    [Header("Effects")]
-    [SerializeField]
-    private GameObject cubeBurstParticles;
 
     private void Awake()
     {
@@ -243,21 +240,6 @@ public class PlayerController : MonoBehaviour
         {
             rechargeReady = true;
         }
-    }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.CompareTag("Obstacle"))
-        {
-            ContactPoint collisionPoint = collision.contacts[0];
-            Vector3 spawnPosition = collisionPoint.point + collisionPoint.normal * 0.5f;
-
-            Instantiate(cubeBurstParticles, spawnPosition + Vector3.up * 1.5f, Quaternion.identity);
-
-            Debug.Log("Obstacle hit: " + collision.gameObject.tag);
-        }
-
-        Debug.Log("OUCH!");
     }
 
     private void OnDrawGizmos()
