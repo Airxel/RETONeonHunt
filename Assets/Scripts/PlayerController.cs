@@ -72,7 +72,7 @@ public class PlayerController : MonoBehaviour
         animator = playerBody.GetComponent<Animator>();
         wheelRenderer = playerWheel.GetComponent<MeshRenderer>();
         wheelMaterials = wheelRenderer.materials;
-        UnityEngine.Cursor.lockState = CursorLockMode.Locked;
+        //UnityEngine.Cursor.lockState = CursorLockMode.Locked;
     }
 
     private void Start()
@@ -86,6 +86,8 @@ public class PlayerController : MonoBehaviour
         playerWheel.transform.position = ballRb.transform.position;
         playerBody.transform.position = new Vector3 (playerWheel.transform.position.x, playerWheel.transform.position.y + 0.075f, playerWheel.transform.position.z);
 
+        PlayerShooting();
+
         if (!rechargeReady)
         {
             RechargeCooldown();
@@ -95,7 +97,6 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         PlayerMovement();
-        PlayerShooting();
     }
 
     private void PlayerMovement()
@@ -170,9 +171,9 @@ public class PlayerController : MonoBehaviour
             Transform targetEnemy = SelectEnemy();
 
             GameObject projectile = projectilePool.GetElementFromPool();
-            projectile.SetActive(true);
             projectile.transform.position = playerAim.transform.position;
             projectile.transform.rotation = playerAim.transform.rotation;
+            projectile.SetActive(true);
 
             ProjectileBehaviour projectileBehaviour = projectile.GetComponent<ProjectileBehaviour>();
 
