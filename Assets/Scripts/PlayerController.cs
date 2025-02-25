@@ -65,6 +65,14 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float shootingDecreasingPoints = -5f;
 
+    [Header("Effects")]
+    [SerializeField]
+    private ParticleSystem leftCannonParticles;
+    [SerializeField]
+    private ParticleSystem rightCannonParticles;
+    [SerializeField]
+    private GameObject wheelTrail;
+
     private void Awake()
     {
         ballRb = GetComponent<Rigidbody>();
@@ -85,6 +93,7 @@ public class PlayerController : MonoBehaviour
     {
         playerWheel.transform.position = ballRb.transform.position;
         playerBody.transform.position = new Vector3 (playerWheel.transform.position.x, playerWheel.transform.position.y + 0.075f, playerWheel.transform.position.z);
+        wheelTrail.transform.rotation = Quaternion.Euler(0f, playerWheel.transform.rotation.y, 0f);
 
         PlayerShooting();
 
@@ -179,11 +188,11 @@ public class PlayerController : MonoBehaviour
 
             if (targetEnemy != null)
             {
-                Vector3 shootDirection = (targetEnemy.position - playerAim.transform.position).normalized;
+                //Vector3 shootDirection = (targetEnemy.position - playerAim.transform.position).normalized;
 
                 projectileBehaviour.ProjectileTarget(targetEnemy);  
 
-                Debug.DrawRay(playerAim.transform.position, shootDirection * 100f, Color.red, 1f);
+                //Debug.DrawRay(playerAim.transform.position, shootDirection * 100f, Color.red, 1f);
             }
             else
             {
@@ -192,11 +201,14 @@ public class PlayerController : MonoBehaviour
 
                 projectileBehaviour.ProjectileDirection(shootDirection);
 
-                Debug.DrawRay(playerAim.transform.position, shootDirection * 100f, Color.green, 1f);
+                //Debug.DrawRay(playerAim.transform.position, shootDirection * 100f, Color.green, 1f);
             }
 
             rechargeReady = false;
             rechargeTimer = rechargeCooldown;
+
+            leftCannonParticles.Play();
+            rightCannonParticles.Play();
 
             UIManager.instance.ScoreManager(shootingDecreasingPoints);
 
@@ -240,6 +252,9 @@ public class PlayerController : MonoBehaviour
         if (rechargeTimer <= 0)
         {
             rechargeReady = true;
+
+            leftCannonParticles.Stop();
+            rightCannonParticles.Stop();
         }
     }
 

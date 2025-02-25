@@ -32,6 +32,7 @@ public class ProjectileBehaviour : MonoBehaviour
         }
 
         transform.forward = projectileDirection;
+        projectileDirection.y = 0f;
         transform.position += projectileDirection * projectileSpeed * Time.deltaTime;
 
         currentLifetime -= Time.deltaTime;

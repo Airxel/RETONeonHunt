@@ -11,6 +11,8 @@ public class WheelRotation : MonoBehaviour
     private float rotationSpeedFactor;
     [SerializeField]
     private float rotationSpeed;
+    [SerializeField]
+    private GameObject enemyWheelTrail;
 
     private void Start()
     {
@@ -21,5 +23,6 @@ public class WheelRotation : MonoBehaviour
     private void Update()
     {
         transform.Rotate(Vector3.down, rotationSpeedFactor * rotationSpeed * Time.deltaTime);
+        enemyWheelTrail.transform.rotation = Quaternion.Euler(0f, transform.rotation.y, 0f);
     }
 }

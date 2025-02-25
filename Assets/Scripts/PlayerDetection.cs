@@ -11,6 +11,8 @@ public class PlayerDetection : MonoBehaviour
     [SerializeField]
     private Transform playerRobot;
     [SerializeField]
+    private GameObject playerParent;
+    [SerializeField]
     private float detectionColliderRange = 20f;
     [SerializeField]
     private bool isPlayerInVision;
@@ -65,19 +67,13 @@ public class PlayerDetection : MonoBehaviour
             {
                 if (hit.collider.transform == playerRobot)
                 {
-                    playerController.position = startingPosition;
-
-                    Debug.DrawRay(transform.position + Vector3.up, povDirection * 100f, Color.yellow, 3f);
+                    //UnityEngine.Cursor.lockState = CursorLockMode.None;
+                    playerParent.SetActive(false);
+                    UIManager.instance.isGameRunning = false; 
+                    UIManager.instance.defeatScreen.SetActive(true);
+                    Debug.Log("DEAD");
                 }
-                else
-                {
-                    Debug.DrawRay(transform.position + Vector3.up, povDirection * 100f, Color.blue, 3f);
-                }
-                
-                Debug.Log("Raycast hit: " + hit.collider.gameObject.name);
-
             }
         }
     }
-
 }

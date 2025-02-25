@@ -5,7 +5,10 @@ using TMPro;
 
 public class UIManager : MonoBehaviour
 {
-    public TextMeshProUGUI enemiesNumber, scoreNumber, timerNumber;
+    [SerializeField]
+    private GameObject playerParent;
+    public GameObject victoryScreen, defeatScreen, timeoutScreen;
+    public TextMeshProUGUI enemiesNumber, scoreNumber, finalScoreNumber, timerNumber;
     [SerializeField]
     private float gameTime = 7f;
     private float gameTimer;
@@ -21,7 +24,7 @@ public class UIManager : MonoBehaviour
     private int currentEnemies;
     [SerializeField]
     private int totalEnemies;
-    private bool isGameRunning = true;
+    public bool isGameRunning = true;
     private bool spawningEnemies = true;
     private float spawningDelay = 0.1f;
 
@@ -44,6 +47,10 @@ public class UIManager : MonoBehaviour
     {
         isGameRunning = true;
         spawningEnemies = true;
+
+        victoryScreen.SetActive(false);
+        defeatScreen.SetActive(false);
+        timeoutScreen.SetActive(false);
 
         gameTimer = gameTime * 60f;
         timerPoints = (gameTimer * 10f);
@@ -92,12 +99,22 @@ public class UIManager : MonoBehaviour
         }
 
         enemiesNumber.text = currentEnemies.ToString() + "/" + totalEnemies.ToString();
+
+        if (currentEnemies <= 0f)
+        {
+            //UnityEngine.Cursor.lockState = CursorLockMode.None;
+            isGameRunning = false;
+            playerParent.SetActive(false);
+            finalScoreNumber.text = scoreNumber.text;
+            victoryScreen.SetActive(true);
+            Debug.Log("YOU WON!");
+        }
     }
 
     public void GameTimer()
     {
         gameTimer -= Time.deltaTime;
-        timerPoints -= Time.deltaTime;
+        timerPoints -= 10f * Time.deltaTime;
 
         int minutes = Mathf.FloorToInt(gameTimer / 60f);
         int seconds = Mathf.FloorToInt(gameTimer % 60f);
@@ -109,8 +126,14 @@ public class UIManager : MonoBehaviour
 
         if (gameTimer <= 0f)
         {
+            gameTimerCountdown = string.Format("{0:00}:{1:00}", 0f, 0f);
+            timerNumber.text = gameTimerCountdown;
+
+            //UnityEngine.Cursor.lockState = CursorLockMode.None;
             isGameRunning = false;
-            Debug.Log("DEAD");
+            playerParent.SetActive(false);
+            timeoutScreen.SetActive(true);
+            Debug.Log("NO MORE TIME!");
         }
     }
 }
