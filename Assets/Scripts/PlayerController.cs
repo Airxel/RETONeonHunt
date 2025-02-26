@@ -73,6 +73,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private GameObject wheelTrail;
 
+    /// <summary>
+    /// Se obtienen las referencias de varios componentes
+    /// </summary>
     private void Awake()
     {
         ballRb = GetComponent<Rigidbody>();
@@ -83,6 +86,9 @@ public class PlayerController : MonoBehaviour
         UnityEngine.Cursor.lockState = CursorLockMode.Locked;
     }
 
+    /// <summary>
+    /// Se obtienen las referencias de los colores iniciales de la rueda
+    /// </summary>
     private void Start()
     {
         movingNeonColor = wheelMaterials[2].color;
@@ -108,6 +114,10 @@ public class PlayerController : MonoBehaviour
         PlayerMovement();
     }
 
+    /// <summary>
+    /// Función que controla el movimiento del jugador, según el rigidbody de la esfera. Movimiento hacia adelante, inclinacion frontal según la velocidad e
+    /// inclinación lateral según el ángulo de giro. Rotación del jugador según la dirección de movimiento y de la cámara
+    /// </summary>
     private void PlayerMovement()
     {
         Vector3 playerMovement = new Vector3(inputActions.playerMove.x, 0.0f, inputActions.playerMove.y).normalized;
@@ -155,6 +165,9 @@ public class PlayerController : MonoBehaviour
         ballRb.AddForce(newPlayerMovement * playerSpeed);
     }
 
+    /// <summary>
+    /// Función que controla el color de la rueda, según la velocidad del jugador
+    /// </summary>
     private void WheelColor()
     {
         float velocityMagnitude = new Vector3(ballRb.velocity.x, 0.0f, ballRb.velocity.z).magnitude;
@@ -171,6 +184,9 @@ public class PlayerController : MonoBehaviour
         wheelRenderer.materials = wheelMaterials;
     }
 
+    /// <summary>
+    /// Función que controla el disparo del jugador, dando una dirección inicial específica según si hay un enemigo o no
+    /// </summary>
     private void PlayerShooting()
     {
         if (inputActions.playerShoot && rechargeReady)
@@ -218,6 +234,9 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Función que controla el cooldown del disparo del jugador
+    /// </summary>
     private void RechargeCooldown()
     {
         rechargeTimer -= Time.deltaTime;
@@ -232,6 +251,10 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Función que, mediante el uso de OverlapSphere y Linecast, obtiene una lista de enemigos (que no estén detrás de obstáculos), marcando al más cercano al jugador
+    /// </summary>
+    /// <returns></returns>
     private Transform SelectEnemy()
     {
         Collider[] enemyColliders = Physics.OverlapSphere(playerBody.transform.position, detectionRadius);
@@ -246,7 +269,6 @@ public class PlayerController : MonoBehaviour
                 Vector3 enemyPosition = collider.transform.position + Vector3.up;
                 float distanceToEnemy = Vector3.Distance(playerBody.transform.position, collider.transform.position + Vector3.up);
 
-                // Verificar si hay un obstáculo entre el jugador y el enemigo
                 if (!Physics.Linecast(playerBody.transform.position, enemyPosition, LayerMask.GetMask("Environment")))
                 {
                     if (distanceToEnemy < detectionArea)
@@ -261,6 +283,9 @@ public class PlayerController : MonoBehaviour
         return nearestEnemy;
     }
 
+    /// <summary>
+    /// Función que dibuja una esfera, para saber el rango de detección de enemigos
+    /// </summary>
     private void OnDrawGizmos()
     {
         Gizmos.DrawWireSphere(playerBody.transform.position, detectionRadius);

@@ -43,6 +43,9 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Función que controla los valores iniciales de la UI
+    /// </summary>
     private void Start()
     {
         isGameRunning = true;
@@ -71,6 +74,9 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Función que añade un pequeño delay a la cuenta de enemigos iniciales en la escena
+    /// </summary>
     private void SpawningDelay()
     {
         spawningDelay -= Time.deltaTime;
@@ -81,6 +87,10 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Función que controla la puntuación, desde varios scripts
+    /// </summary>
+    /// <param name="points"></param>
     public void ScoreManager(float points)
     {
         addedPoints += points;
@@ -89,6 +99,10 @@ public class UIManager : MonoBehaviour
         scoreNumber.text = finalScore.ToString();
     }
 
+    /// <summary>
+    /// Función que controla la cantidad de enemigos en la escena
+    /// </summary>
+    /// <param name="enemy"></param>
     public void EnemiesManager(int enemy)
     {
         currentEnemies += enemy;
@@ -107,10 +121,12 @@ public class UIManager : MonoBehaviour
             playerParent.SetActive(false);
             finalScoreNumber.text = scoreNumber.text;
             victoryScreen.SetActive(true);
-            Debug.Log("YOU WON!");
         }
     }
 
+    /// <summary>
+    /// Función que controla el tiempo de juego
+    /// </summary>
     public void GameTimer()
     {
         gameTimer -= Time.deltaTime;
@@ -133,7 +149,6 @@ public class UIManager : MonoBehaviour
             isGameRunning = false;
             playerParent.SetActive(false);
             timeoutScreen.SetActive(true);
-            Debug.Log("NO MORE TIME!");
         }
     }
 }

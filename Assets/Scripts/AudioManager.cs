@@ -25,17 +25,29 @@ public class AudioManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Función que se llama desde otros scripts, para que un sonido suene una vez
+    /// </summary>
+    /// <param name="audioClip"></param>
     public void PlayOneShot(AudioClip audioClip)
     {
         playerSource.PlayOneShot(audioClip);
     }
 
+    /// <summary>
+    /// Función que se llama desde otros scripts, para que un sonido suene
+    /// </summary>
+    /// <param name="audioClip"></param>
     public void PlaySound(AudioClip audioClip)
     {
         playerSource.clip = audioClip;
         playerSource.Play();
     }
 
+    /// <summary>
+    /// Función que se llama desde otros scripts, para que un sonido deje de sonar
+    /// </summary>
+    /// <param name="audioClip"></param>
     public void StopSound(AudioClip audioClip)
     {
         if (playerSource.clip = audioClip)
@@ -44,6 +56,11 @@ public class AudioManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Función que se llama desde otros scripts, para que un sonido suene una vez, pero desde un punto específico
+    /// </summary>
+    /// <param name="audioClip"></param>
+    /// <param name="hitPosition"></param>
     public void PlaySoundSpawner(AudioClip audioClip, Vector3 hitPosition)
     {
         GameObject audioSourceSpawn = Instantiate(oneShotAudioSource, hitPosition, Quaternion.identity);
