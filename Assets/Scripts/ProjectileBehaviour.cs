@@ -79,6 +79,8 @@ public class ProjectileBehaviour : MonoBehaviour
 
             Vector3 spawnPosition = other.transform.position + Vector3.up;
             Instantiate(cubeBurstParticles, spawnPosition, Quaternion.identity);
+
+            AudioManager.instance.PlaySoundSpawner(AudioManager.instance.enemyEliminatedSound, other.transform.position);
             enemyInstance.SetActive(false);
 
             UIManager.instance.ScoreManager(enemyIncreasingPoints);
@@ -89,7 +91,8 @@ public class ProjectileBehaviour : MonoBehaviour
             Vector3 spawnPosition = other.ClosestPoint(transform.position);
             Instantiate(cubeBurstParticles, spawnPosition, Quaternion.identity);
         }
-        
+
+        AudioManager.instance.PlaySoundSpawner(AudioManager.instance.projectileHitSound, other.ClosestPoint(transform.position));
         projectilePool.ReturnToPool(gameObject);
     }
 }

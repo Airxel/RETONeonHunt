@@ -62,7 +62,8 @@ public class PlayerDetection : MonoBehaviour
             {
                 if (hit.collider.transform == playerRobot)
                 {
-                    //UnityEngine.Cursor.lockState = CursorLockMode.None;
+                    UnityEngine.Cursor.lockState = CursorLockMode.None;
+                    AudioManager.instance.PlaySoundSpawner(AudioManager.instance.playerEliminatedSound, hit.transform.position);
                     playerParent.SetActive(false);
                     UIManager.instance.isGameRunning = false; 
                     UIManager.instance.defeatScreen.SetActive(true);

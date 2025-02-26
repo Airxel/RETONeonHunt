@@ -80,7 +80,7 @@ public class PlayerController : MonoBehaviour
         animator = playerBody.GetComponent<Animator>();
         wheelRenderer = playerWheel.GetComponent<MeshRenderer>();
         wheelMaterials = wheelRenderer.materials;
-        //UnityEngine.Cursor.lockState = CursorLockMode.Locked;
+        UnityEngine.Cursor.lockState = CursorLockMode.Locked;
     }
 
     private void Start()
@@ -176,6 +176,8 @@ public class PlayerController : MonoBehaviour
         if (inputActions.playerShoot && rechargeReady)
         {
             animator.SetTrigger("Shoot");
+            AudioManager.instance.PlayOneShot(AudioManager.instance.shootingSound);
+            AudioManager.instance.PlaySound(AudioManager.instance.shootingCooldownSound);
 
             Transform targetEnemy = SelectEnemy();
 
@@ -216,6 +218,20 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void RechargeCooldown()
+    {
+        rechargeTimer -= Time.deltaTime;
+
+        if (rechargeTimer <= 0)
+        {
+            rechargeReady = true;
+
+            leftCannonParticles.Stop();
+            rightCannonParticles.Stop();
+            AudioManager.instance.StopSound(AudioManager.instance.shootingCooldownSound);
+        }
+    }
+
     private Transform SelectEnemy()
     {
         Collider[] enemyColliders = Physics.OverlapSphere(playerBody.transform.position, detectionRadius);
@@ -243,19 +259,6 @@ public class PlayerController : MonoBehaviour
         }
 
         return nearestEnemy;
-    }
-
-    private void RechargeCooldown()
-    {
-        rechargeTimer -= Time.deltaTime;
-
-        if (rechargeTimer <= 0)
-        {
-            rechargeReady = true;
-
-            leftCannonParticles.Stop();
-            rightCannonParticles.Stop();
-        }
     }
 
     private void OnDrawGizmos()

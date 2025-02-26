@@ -102,7 +102,7 @@ public class UIManager : MonoBehaviour
 
         if (currentEnemies <= 0f)
         {
-            //UnityEngine.Cursor.lockState = CursorLockMode.None;
+            UnityEngine.Cursor.lockState = CursorLockMode.None;
             isGameRunning = false;
             playerParent.SetActive(false);
             finalScoreNumber.text = scoreNumber.text;
@@ -129,7 +129,7 @@ public class UIManager : MonoBehaviour
             gameTimerCountdown = string.Format("{0:00}:{1:00}", 0f, 0f);
             timerNumber.text = gameTimerCountdown;
 
-            //UnityEngine.Cursor.lockState = CursorLockMode.None;
+            UnityEngine.Cursor.lockState = CursorLockMode.None;
             isGameRunning = false;
             playerParent.SetActive(false);
             timeoutScreen.SetActive(true);
