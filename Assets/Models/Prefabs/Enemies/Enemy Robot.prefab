@@ -69,9 +69,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 34decf1e4b8084740837a48d90eec98b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerController: {fileID: 0}
+  detectionCollider: {fileID: 7367577695101858931}
   playerRobot: {fileID: 0}
-  playerParent: {fileID: 0}
+  playerParent: {fileID: 2381597085619128353, guid: 346aba633218df74dac8cd867a42cf45,
+    type: 3}
   detectionColliderRange: 20
   isPlayerInVision: 0
 --- !u!1 &6559550689452575394

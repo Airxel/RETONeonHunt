@@ -5,9 +5,8 @@ using UnityEngine.UIElements;
 
 public class PlayerDetection : MonoBehaviour
 {
-    private CapsuleCollider detectionCollider;
     [SerializeField]
-    private Transform playerController;
+    private CapsuleCollider detectionCollider;
     [SerializeField]
     private Transform playerRobot;
     [SerializeField]
@@ -16,28 +15,17 @@ public class PlayerDetection : MonoBehaviour
     private float detectionColliderRange = 20f;
     [SerializeField]
     private bool isPlayerInVision;
-    private Vector3 startingPosition;
-
-    private void Awake()
-    {
-        detectionCollider = GetComponent<CapsuleCollider>();
-    }
-
-    private void Start()
-    {
-        startingPosition = playerController.position;
-
-        
-    }
 
     private void Update()
     {
-        detectionCollider.center = new Vector3(detectionColliderRange / 2, detectionCollider.center.y, detectionCollider.center.z);
-        detectionCollider.height = detectionColliderRange;
-
+        DetectionColliderSize();
         PlayerDetectionSystem();
     }
 
+    /// <summary>
+    /// Función para comprobar si el jugador está en el rango de detección
+    /// </summary>
+    /// <param name="other"></param>
     private void OnTriggerEnter(Collider other)
     {
         if (other.transform == playerRobot)
@@ -46,6 +34,10 @@ public class PlayerDetection : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Función para comprobar si el jugador sale del rango de detección
+    /// </summary>
+    /// <param name="other"></param>
     private void OnTriggerExit(Collider other)
     {
         if (other.transform == playerRobot)
@@ -54,6 +46,9 @@ public class PlayerDetection : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Función para detectar al jugador, siempre y cuando no haya un obstáculo en medio
+    /// </summary>
     private void PlayerDetectionSystem()
     {
         if (isPlayerInVision)
@@ -71,9 +66,17 @@ public class PlayerDetection : MonoBehaviour
                     playerParent.SetActive(false);
                     UIManager.instance.isGameRunning = false; 
                     UIManager.instance.defeatScreen.SetActive(true);
-                    Debug.Log("DEAD");
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Función para controlar el tamaño del área de detección desde el inspector
+    /// </summary>
+    private void DetectionColliderSize()
+    {
+        detectionCollider.center = new Vector3(detectionColliderRange / 2, detectionCollider.center.y, detectionCollider.center.z);
+        detectionCollider.height = detectionColliderRange;
     }
 }

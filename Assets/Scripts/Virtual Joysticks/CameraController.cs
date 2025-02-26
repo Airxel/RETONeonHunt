@@ -14,6 +14,9 @@ public class CameraController : MonoBehaviour
     [SerializeField]
     private float yRotationSensitivity = 0.01f;
 
+    /// <summary>
+    /// Función que controla la rotación de la cámara cuando se usa el joystick virtual, según el input
+    /// </summary>
     private void Update()
     {
         Vector2 lookInput = inputActions.playerLook;

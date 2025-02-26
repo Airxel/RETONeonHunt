@@ -23,6 +23,9 @@ public class ProjectileBehaviour : MonoBehaviour
     [SerializeField]
     private GameObject cubeBurstParticles;
 
+    /// <summary>
+    /// Función que controla el movimiento y el tiempo del proyectil. Si hay un enemigo detectado, cambia de dirección continuamente hacia el enemigo
+    /// </summary>
     private void Update()
     {
         if (projectileTarget != null)
@@ -43,6 +46,10 @@ public class ProjectileBehaviour : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Función que obtiene la dirección desde donde se dispara el proyectil, si no hay enemigo detectado
+    /// </summary>
+    /// <param name="shootDirection"></param>
     public void ProjectileDirection(Vector3 shootDirection)
     {
         projectileDirection = shootDirection;
@@ -50,12 +57,20 @@ public class ProjectileBehaviour : MonoBehaviour
         projectileTarget = null;
     }
 
+    /// <summary>
+    /// Función que obtiene si hay un enemigo detectado o no, una vez se ejecute un disparo
+    /// </summary>
+    /// <param name="newProjectileTarget"></param>
     public void ProjectileTarget(Transform newProjectileTarget)
     {
         projectileTarget = newProjectileTarget;
         currentLifetime = lifetime;
     }
 
+    /// <summary>
+    /// Función que controla como interactúa el proyectil con el entorno y los enemigos, devolviéndolo a la pool
+    /// </summary>
+    /// <param name="other"></param>
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Enemy"))
@@ -76,7 +91,5 @@ public class ProjectileBehaviour : MonoBehaviour
         }
         
         projectilePool.ReturnToPool(gameObject);
-
-        Debug.Log("Projectile hit: " + other.tag);
     }
 }
