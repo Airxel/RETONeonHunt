@@ -192,6 +192,7 @@ public class PlayerController : MonoBehaviour
         if (inputActions.playerShoot && rechargeReady)
         {
             animator.SetTrigger("Shoot");
+            CameraController.instance.CameraShake();
             AudioManager.instance.PlayOneShot(AudioManager.instance.shootingSound);
             AudioManager.instance.PlaySound(AudioManager.instance.shootingCooldownSound);
 

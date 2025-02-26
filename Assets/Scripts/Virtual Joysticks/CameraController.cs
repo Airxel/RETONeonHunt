@@ -8,11 +8,28 @@ public class CameraController : MonoBehaviour
     [SerializeField]
     private CinemachineFreeLook freeLookCamera;
     [SerializeField]
+    private CinemachineImpulseSource impulseSource;
+    [SerializeField]
     private InputActions inputActions;
     [SerializeField]
     private float xRotationSensitivity = 0.05f;
     [SerializeField]
     private float yRotationSensitivity = 0.01f;
+
+    //Singleton
+    public static CameraController instance;
+
+    private void Awake()
+    {
+        if (CameraController.instance == null)
+        {
+            CameraController.instance = this;
+        }
+        else
+        {
+            Destroy(this);
+        }
+    }
 
     /// <summary>
     /// Función que controla la rotación de la cámara cuando se usa el joystick virtual, según el input
@@ -23,5 +40,13 @@ public class CameraController : MonoBehaviour
 
         freeLookCamera.m_XAxis.Value += lookInput.x * xRotationSensitivity * Time.deltaTime;
         freeLookCamera.m_YAxis.Value += lookInput.y * yRotationSensitivity * Time.deltaTime;
+    }
+
+    /// <summary>
+    /// Función que realiza un shake de la cámara
+    /// </summary>
+    public void CameraShake()
+    {
+        impulseSource.GenerateImpulse();
     }
 }
