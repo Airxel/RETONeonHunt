@@ -83,7 +83,9 @@ public class PlayerController : MonoBehaviour
         animator = playerBody.GetComponent<Animator>();
         wheelRenderer = playerWheel.GetComponent<MeshRenderer>();
         wheelMaterials = wheelRenderer.materials;
+
         UnityEngine.Cursor.lockState = CursorLockMode.Locked;
+        //Application.targetFrameRate = 60;
     }
 
     /// <summary>
