@@ -50,7 +50,7 @@ public class EnergySystem : MonoBehaviour
         canShoot = true;
         energyRechargePowerUpActive = false;
         currentEnergyRechargePowerUpDuration = energyRechargePowerUpDuration;
-        UIManager.instance.energyNumber.text = currentEnergy.ToString();
+        UIManager.instance.energyNumber.text = currentEnergy.ToString("F000") + " % ";
     }
 
 
@@ -58,8 +58,6 @@ public class EnergySystem : MonoBehaviour
     {
         CanShoot();
         EnergyPerSecond();
-
-        UIManager.instance.energyNumber.text = string.Format("{000}", currentEnergy);
     }
 
     public void CanShoot()
@@ -102,6 +100,8 @@ public class EnergySystem : MonoBehaviour
                 currentEnergyCooldown = 10f;
             }
         }
+
+        UIManager.instance.energyNumber.text = currentEnergy.ToString("F000") + " % ";
     }
 
     private void EnergyRecharPowerUpDuration()

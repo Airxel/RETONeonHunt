@@ -172,7 +172,7 @@
                     "path": "Virtual Joystick",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";Keyboard&Mouse;Gamepad;Joystick;XR",
+                    "groups": ";Keyboard&Mouse;Gamepad;Joystick;XR;Touch",
                     "action": "Look",
                     "isComposite": false,
                     "isPartOfComposite": false
