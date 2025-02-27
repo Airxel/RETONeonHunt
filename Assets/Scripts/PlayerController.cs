@@ -55,9 +55,9 @@ public class PlayerController : MonoBehaviour
     [Header("Shooting")]
     public GenericPool projectilePool;
     [SerializeField]
-    private bool rechargeReady = true;
+    public bool rechargeReady = true;
     [SerializeField]
-    private float rechargeCooldown = 1.5f;
+    public float rechargeCooldown = 5f;
     [SerializeField]
     private float rechargeTimer;
     [SerializeField]
@@ -189,7 +189,7 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private void PlayerShooting()
     {
-        if (inputActions.playerShoot && rechargeReady)
+        if (inputActions.playerShoot && rechargeReady && EnergySystem.instance.canShoot == true)
         {
             animator.SetTrigger("Shoot");
             CameraController.instance.CameraShake();
@@ -226,6 +226,8 @@ public class PlayerController : MonoBehaviour
             rechargeReady = false;
             rechargeTimer = rechargeCooldown;
 
+            EnergySystem.instance.EnergyRecharge(-EnergySystem.instance.energyPerShoot);
+
             leftCannonParticles.Play();
             rightCannonParticles.Play();
 
@@ -245,6 +247,7 @@ public class PlayerController : MonoBehaviour
         if (rechargeTimer <= 0)
         {
             rechargeReady = true;
+            EnergySystem.instance.currentEnergyCooldown = rechargeCooldown;
 
             leftCannonParticles.Stop();
             rightCannonParticles.Stop();
@@ -282,6 +285,20 @@ public class PlayerController : MonoBehaviour
         }
 
         return nearestEnemy;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Energy Recharge"))
+        {
+            EnergySystem.instance.energyRechargePowerUpActive = true;
+            Destroy(other.gameObject);
+        }
+        else if (other.CompareTag("Instant Energy"))
+        {
+            Destroy(other.gameObject);
+            EnergySystem.instance.currentEnergy = 100f;
+        }
     }
 
     /// <summary>

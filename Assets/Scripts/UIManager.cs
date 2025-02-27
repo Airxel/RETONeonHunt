@@ -8,7 +8,7 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private GameObject playerParent;
     public GameObject victoryScreen, defeatScreen, timeoutScreen;
-    public TextMeshProUGUI enemiesNumber, scoreNumber, finalScoreNumber, timerNumber;
+    public TextMeshProUGUI enemiesNumber, scoreNumber, finalScoreNumber, timerNumber, energyNumber;
     [SerializeField]
     private float gameTime = 7f;
     private float gameTimer;

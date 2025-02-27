@@ -6,6 +6,8 @@ using UnityEngine;
 public class CameraController : MonoBehaviour
 {
     [SerializeField]
+    private GameObject mainCamera;
+    [SerializeField]
     private CinemachineFreeLook freeLookCamera;
     [SerializeField]
     private CinemachineImpulseSource impulseSource;
@@ -15,6 +17,8 @@ public class CameraController : MonoBehaviour
     private float xRotationSensitivity = 0.05f;
     [SerializeField]
     private float yRotationSensitivity = 0.01f;
+    [SerializeField]
+    private GameObject playerBody;
 
     //Singleton
     public static CameraController instance;
@@ -37,9 +41,13 @@ public class CameraController : MonoBehaviour
     private void Update()
     {
         Vector2 lookInput = inputActions.playerLook;
+        //freeLookCamera.transform.position = playerBody.transform.position;
 
         freeLookCamera.m_XAxis.Value += lookInput.x * xRotationSensitivity * Time.deltaTime;
         freeLookCamera.m_YAxis.Value += lookInput.y * yRotationSensitivity * Time.deltaTime;
+
+        //freeLookCamera.LookAt = playerBody.transform;
+        //freeLookCamera.Follow = playerBody.transform;
     }
 
     /// <summary>

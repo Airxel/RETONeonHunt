@@ -23,6 +23,17 @@ public class ProjectileBehaviour : MonoBehaviour
     [SerializeField]
     private GameObject cubeBurstParticles;
 
+    [Header("Drops")]
+    [SerializeField]
+    private int spawnChance;
+    [SerializeField]
+    public GameObject energyRechargeDrop, instantEnergyDrop;
+
+    private void Start()
+    {
+        spawnChance = Random.Range(0, 100);
+    }
+
     /// <summary>
     /// Función que controla el movimiento y el tiempo del proyectil. Si hay un enemigo detectado, cambia de dirección continuamente hacia el enemigo
     /// </summary>
@@ -85,6 +96,24 @@ public class ProjectileBehaviour : MonoBehaviour
 
             UIManager.instance.ScoreManager(enemyIncreasingPoints);
             UIManager.instance.EnemiesManager(-1);
+
+            spawnChance = Random.Range(0, 100);
+
+            if (spawnChance >= 85)
+            {
+                if (spawnChance >= 95)
+                {
+                    Instantiate(energyRechargeDrop, other.transform.position, Quaternion.identity);
+                    Debug.Log("Spawning Energy Recharging");
+                }
+                else
+                {
+                    Instantiate(instantEnergyDrop, other.transform.position, Quaternion.identity);
+                    Debug.Log("Spawning Instant Energy");
+                }
+            }
+
+            Debug.Log(spawnChance);
         }
         else if (other.CompareTag("Obstacle"))
         {

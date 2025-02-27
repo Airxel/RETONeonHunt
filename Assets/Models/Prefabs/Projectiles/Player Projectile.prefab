@@ -77,6 +77,11 @@ MonoBehaviour:
   enemyIncreasingPoints: 10
   cubeBurstParticles: {fileID: 4564135285506915222, guid: d46466d349e916b44bc42a3146dee2b8,
     type: 3}
+  spawnChance: 0
+  energyRechargeDrop: {fileID: 5718499397445229683, guid: b57d5922789b7d641a03081f3aaae6e8,
+    type: 3}
+  instantEnergyDrop: {fileID: 5776860874327338981, guid: c0626571dd517254aae36c269193235c,
+    type: 3}
 --- !u!1001 &7900294608710635699
 PrefabInstance:
   m_ObjectHideFlags: 0
