@@ -41,13 +41,10 @@ public class CameraController : MonoBehaviour
     private void Update()
     {
         Vector2 lookInput = inputActions.playerLook;
-        //freeLookCamera.transform.position = playerBody.transform.position;
 
         freeLookCamera.m_XAxis.Value += lookInput.x * xRotationSensitivity * Time.deltaTime;
         freeLookCamera.m_YAxis.Value += lookInput.y * yRotationSensitivity * Time.deltaTime;
 
-        //freeLookCamera.LookAt = playerBody.transform;
-        //freeLookCamera.Follow = playerBody.transform;
     }
 
     /// <summary>
